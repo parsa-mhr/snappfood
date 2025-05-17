@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- MySQL Database connection settings -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/snappfood?allowPublicKeyRetrieval=true&amp;useSSL=false
+        </property>
+        <property name="hibernate.connection.username">javauser</property>
+        <property name="hibernate.connection.password">snappfood123</property>
+
+        <!-- JDBC connection pool (use the built-in) -->
+        <property name="connection.pool_size">10</property>
+
+        <!-- SQL dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
+
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
+
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hbm2ddl.auto">update</property>
+
+        <!-- Mapping your annotated entity classes -->
+        <mapping class="org.example.User.User"/>
+
+        <mapping class="org.example.User.Seller"/>
+        <!-- یا -->
+        <!-- <mapping resource="yourEntity.hbm.xml"/> -->
+    </session-factory>
+</hibernate-configuration>
