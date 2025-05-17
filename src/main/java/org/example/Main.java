@@ -1,41 +1,70 @@
 package org.example;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import com.sun.net.httpserver.*;
+import org.hibernate.*;
 import org.hibernate.cfg.* ;
+import org.example.ServerHandlers.* ;
 import org.example.User.* ;
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 public class Main {
-    public static void main(String[] args) {
+    public static SessionFactory sessionFactory;
+
+    public static void inserttodb(User user) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+
+            // ساخت شی Seller
+            session.save(user);
+
+            transaction.commit();
+            System.out.println("Seller saved with ID: " + user.getId());
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+    public static Seller getSellerBylogin(String email, String password) {
+        Seller seller = null;
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM Seller s WHERE s.email = :email AND s.password = :password";
+            seller = session.createQuery(hql, Seller.class)
+                    .setParameter("email", email)
+                    .setParameter("password", password)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return seller;
+    }
+
+
+    public static void main(String[] args) throws Exception {
         // کانفیگ Hibernate از فایل hibernate.cfg.xml می‌خوانیم
+        // connect to db
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
 
         // اضافه کردن کلاس‌های Entity
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Seller.class);
+        sessionFactory = configuration.buildSessionFactory();
 
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        // connect to server
+        int port = 8080;
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        server.createContext("/", new MainPageHandler());
+        server.createContext("/user", new RegisterHandler());
+        server.setExecutor(null);
+        server.start();
+        System.err.println("Server Started on port " + port + "...!");
 
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-
-            // ساخت شی Seller
-            Seller seller = new Seller("Koskhold", "MyShop@gmail.com", "123" , "hasanshop");
-            // ذخیره شی
-            seller.setShopName("HassanShop");
-            session.save(seller);
-
-            transaction.commit();
-            System.out.println("Seller saved with ID: " + seller.getId());
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-        } finally {
-            session.close();
-            sessionFactory.close();
-        }
     }
 }
