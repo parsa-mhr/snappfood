@@ -12,20 +12,21 @@ public abstract class User {
     private long id;
     @Column(nullable = false)
     protected String name;
-    @Column(nullable = false)//
+    @Column(nullable = false) //
     protected String lastname;//
     @Column(unique = true, nullable = false)
     protected String email;
     @Column(nullable = false)
     protected String password;
-    
+    @Column(unique = true, nullable = false)
+    protected String phonenumber;
 
-
-    public User(String name, String familyName, String email, String password) {
+    public User(String name, String familyName, String email, String password, String phonenumber) {
         this.name = name;
         this.lastname = familyName;//
         this.email = email;
         this.password = password;
+        this.phonenumber = phonenumber;//
     }
 
     public User() {
@@ -51,6 +52,14 @@ public abstract class User {
     public String getfamilyName() {
         return lastname;
     }//
+
+    public String getphonenumber() {
+        return phonenumber;
+    }
+
+    public void setphonenumber(String phonenumber) {
+        this.phonenumber = phonenumber;
+    }
 
     public String getEmail() {
         return email;

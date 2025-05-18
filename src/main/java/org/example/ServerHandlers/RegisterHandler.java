@@ -82,6 +82,8 @@ public class RegisterHandler implements HttpHandler {
                             <input name="firstName" type="text" required /0>
                             <label>نام خانوادگی:</label>
                             <input name="lastname" type="text" required /0>
+                            <label>شماره تماس:</label>
+                            <input name="phonenumber" type="text" required /0>                            
                             <label>رمز عبور:</label>
                             <input name="password" type="password" required />
                             <label>ایمیل:</label>
@@ -162,6 +164,7 @@ public class RegisterHandler implements HttpHandler {
         Seller seller = new Seller();
         seller.setName(fields.get("firstName"));
         seller.setfamilyName(fields.get("lastname"));
+        seller.setphonenumber(fields.get("phonenumber"));
         seller.setEmail(fields.get("email"));
         seller.setPassword(fields.get("password"));
         seller.setShopName(fields.get("shopname"));
