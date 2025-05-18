@@ -21,6 +21,11 @@ public class Main {
             System.out.println("Invalid phone number format: " + user.getphonenumber());
             return; // شماره نامعتبر است، ذخیره انجام نمی‌شود
         }
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@gmail\\.com$";
+        if (!user.getEmail().matches(emailRegex)) {
+            System.out.println("Invalid email format: " + user.getEmail());
+            return;
+        }
 
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
@@ -35,7 +40,7 @@ public class Main {
 
             if (existingUserByEmail != null) {
                 System.out.println("User with email " + user.getEmail() + " already exists.");
-                return;
+                return; 
             }
 
             // بررسی وجود کاربر با شماره تماس مشابه
