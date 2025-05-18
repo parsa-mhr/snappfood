@@ -3,27 +3,29 @@ package org.example.User;
 import jakarta.persistence.*;
 
 @Entity
-@Table (name = "Sellers")
+@Table(name = "Sellers")
 public class Seller extends User {
     @Id
-    private Long id ;
-    @Column (nullable = false)
-    String Shopname ;
+    private Long id;
+    @Column(nullable = false)
+    String Shopname;
     @Lob
     @Column(name = "image", columnDefinition = "LONGBLOB")
-    byte[] ShopImage ;
+    byte[] ShopImage;
 
-    public Seller (String name, String email, String password, String Shopname) {
-        super (name , email , password);
+    public Seller(String name, String email, String password, String Shopname) {
+        super(name, email, password);
         Shopname = Shopname;
     }
+
     public Seller() {
-        super("","","");
+        super("", "", "");
     }
 
     public void setShopName(String Shopname) {
         this.Shopname = Shopname;
     }
+
     public void setShopImage(byte[] ShopImage) {
         this.ShopImage = ShopImage;
     }

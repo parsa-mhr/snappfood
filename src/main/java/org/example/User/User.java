@@ -10,7 +10,9 @@ public abstract class User {
     private long id ;
     @Column (nullable = false)
     protected String name;
+    @Column (unique = true , nullable = false)
     protected String email;
+    @Column (nullable = false)
     protected String password;
     public User(String name, String email, String password) {
         this.name = name;

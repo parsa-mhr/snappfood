@@ -28,7 +28,7 @@
 
         <!-- Mapping your annotated entity classes -->
         <mapping class="org.example.User.User"/>
-
+        <!--  entity table -->
         <mapping class="org.example.User.Seller"/>
         <!-- یا -->
         <!-- <mapping resource="yourEntity.hbm.xml"/> -->

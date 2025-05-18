@@ -1,9 +1,10 @@
 package org.example;
+
 import com.sun.net.httpserver.*;
 import org.hibernate.*;
-import org.hibernate.cfg.* ;
-import org.example.ServerHandlers.* ;
-import org.example.User.* ;
+import org.hibernate.cfg.*;
+import org.example.ServerHandlers.*;
+import org.example.User.*;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
@@ -19,18 +20,29 @@ public class Main {
         try {
             transaction = session.beginTransaction();
 
-            // ساخت شی Seller
-            session.save(user);
+            // بررسی وجود کاربر با ایمیل مشابه
+            String hql = "FROM User u WHERE u.email = :email";
+            User existingUser = session.createQuery(hql, User.class)
+                    .setParameter("email", user.getEmail())
+                    .uniqueResult();
 
+            if (existingUser != null) {
+                System.out.println("User with email " + user.getEmail() + " already exists.");
+                return; // اگر کاربر وجود داشت، دیگر ذخیره نمی‌کنیم
+            }
+
+            session.save(user);
             transaction.commit();
-            System.out.println("Seller saved with ID: " + user.getId());
+            System.out.println("User saved with ID: " + user.getId());
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null)
+                transaction.rollback();
             e.printStackTrace();
         } finally {
             session.close();
         }
     }
+
     public static Seller getSellerBylogin(String email, String password) {
         Seller seller = null;
         try (Session session = sessionFactory.openSession()) {
@@ -44,7 +56,6 @@ public class Main {
         }
         return seller;
     }
-
 
     public static void main(String[] args) throws Exception {
         // کانفیگ Hibernate از فایل hibernate.cfg.xml می‌خوانیم
