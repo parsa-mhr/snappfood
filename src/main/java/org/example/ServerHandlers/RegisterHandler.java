@@ -81,7 +81,7 @@ public class RegisterHandler implements HttpHandler {
                             <label>نام:</label>
                             <input name="firstName" type="text" required /0>
                             <label>نام خانوادگی:</label>
-                            <input name="last name" type="text" required /0>
+                            <input name="lastname" type="text" required /0>
                             <label>رمز عبور:</label>
                             <input name="password" type="password" required />
                             <label>ایمیل:</label>
@@ -166,7 +166,7 @@ public class RegisterHandler implements HttpHandler {
         seller.setPassword(fields.get("password"));
         seller.setShopName(fields.get("shopname"));
         seller.setShopImage(imageBytes); // ست کردن BLOB
-
+        System.out.println(seller);
         Main.inserttodb(seller); // ذخیره در دیتابیس
         sendSuccess(exchange);
     }
