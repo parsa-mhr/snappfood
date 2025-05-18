@@ -15,20 +15,38 @@ public class Main {
     public static SessionFactory sessionFactory;
 
     public static void inserttodb(User user) {
+        // اعتبارسنجی شماره تماس
+        String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
+        if (!user.getphonenumber().matches(phoneRegex)) {
+            System.out.println("Invalid phone number format: " + user.getphonenumber());
+            return; // شماره نامعتبر است، ذخیره انجام نمی‌شود
+        }
+
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
 
             // بررسی وجود کاربر با ایمیل مشابه
-            String hql = "FROM User u WHERE u.email = :email";
-            User existingUser = session.createQuery(hql, User.class)
+            String emailHql = "FROM User u WHERE u.email = :email";
+            User existingUserByEmail = session.createQuery(emailHql, User.class)
                     .setParameter("email", user.getEmail())
                     .uniqueResult();
 
-            if (existingUser != null) {
+            if (existingUserByEmail != null) {
                 System.out.println("User with email " + user.getEmail() + " already exists.");
-                return; // اگر کاربر وجود داشت، دیگر ذخیره نمی‌کنیم
+                return;
+            }
+
+            // بررسی وجود کاربر با شماره تماس مشابه
+            String phoneHql = "FROM User u WHERE u.phonenumber = :phonenumber";
+            User existingUserByPhone = session.createQuery(phoneHql, User.class)
+                    .setParameter("phonenumber", user.getphonenumber())
+                    .uniqueResult();
+
+            if (existingUserByPhone != null) {
+                System.out.println("User with phone number " + user.getphonenumber() + " already exists.");
+                return;
             }
 
             session.save(user);

@@ -2,6 +2,7 @@ package org.example.User;
 
 import java.util.ArrayList;
 import jakarta.persistence.*;
+//import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "users")
@@ -18,6 +19,8 @@ public abstract class User {
     protected String email;
     @Column(nullable = false)
     protected String password;
+    // @Pattern(regexp = "^(09\\d{9}|۰۹[۰-۹]{9})$", message = "Phone number must be
+    // in the format 09123456789 or ۰۹۱۲۳۴۵۶۷۸۹")
     @Column(unique = true, nullable = false)
     protected String phonenumber;
 
