@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.Security.PasswordUtil;//
 import com.sun.net.httpserver.*;
 import org.hibernate.*;
 import org.hibernate.cfg.*;
@@ -40,7 +41,7 @@ public class Main {
 
             if (existingUserByEmail != null) {
                 System.out.println("User with email " + user.getEmail() + " already exists.");
-                return; 
+                return;
             }
 
             // بررسی وجود کاربر با شماره تماس مشابه
@@ -53,7 +54,7 @@ public class Main {
                 System.out.println("User with phone number " + user.getphonenumber() + " already exists.");
                 return;
             }
-
+            user.setPassword(PasswordUtil.hashPassword(user.getPassword()));// هش کردن پسورد
             session.save(user);
             transaction.commit();
             System.out.println("User saved with ID: " + user.getId());
@@ -67,17 +68,19 @@ public class Main {
     }
 
     public static Seller getSellerBylogin(String email, String password) {
-        Seller seller = null;
         try (Session session = sessionFactory.openSession()) {
-            String hql = "FROM Seller s WHERE s.email = :email AND s.password = :password";
-            seller = session.createQuery(hql, Seller.class)
+            String hql = "FROM Seller s WHERE s.email = :email";
+            Seller seller = session.createQuery(hql, Seller.class)
                     .setParameter("email", email)
-                    .setParameter("password", password)
                     .uniqueResult();
+
+            if (seller != null && PasswordUtil.checkPassword(password, seller.getPassword())) {
+                return seller;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return seller;
+        return null;
     }
 
     public static void main(String[] args) throws Exception {

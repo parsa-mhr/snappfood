@@ -15,7 +15,7 @@ public abstract class User {
     protected String name;
     @Column(nullable = false) //
     protected String lastname;//
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false)//
     protected String email;
     @Column(nullable = false)
     protected String password;
