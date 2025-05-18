@@ -179,7 +179,41 @@ public class RegisterHandler implements HttpHandler {
     }
 
     private void sendSuccess(HttpExchange exchange) throws IOException {
-        String msg = "<html><body><h3>ثبت نام با موفقیت انجام شد.</h3></body></html>";
+        String msg = """
+                    <html dir="rtl">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>ثبت‌نام موفق</title>
+                        <style>
+                            body {
+                                font-family: "Vazir", sans-serif;
+                                background: linear-gradient(to right, #8e9eab, #eef2f3);
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100vh;
+                            }
+                            .container {
+                                background-color: white;
+                                padding: 2rem;
+                                border-radius: 20px;
+                                text-align: center;
+                                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+                                max-width: 400px;
+                                width: 100%;
+                            }
+                            h2 {
+                                color: green;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h2>ثبت‌نام با موفقیت انجام شد 🎉</h2>
+                        </div>
+                    </body>
+                    </html>
+                """;
         exchange.sendResponseHeaders(200, msg.getBytes().length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(msg.getBytes());
