@@ -80,6 +80,8 @@ public class RegisterHandler implements HttpHandler {
                         <form method="post" enctype="multipart/form-data">
                             <label>نام:</label>
                             <input name="firstName" type="text" required /0>
+                            <label>نام خانوادگی:</label>
+                            <input name="last name" type="text" required /0>
                             <label>رمز عبور:</label>
                             <input name="password" type="password" required />
                             <label>ایمیل:</label>
@@ -119,7 +121,8 @@ public class RegisterHandler implements HttpHandler {
         for (String part : parts) {
             if (part.contains("Content-Disposition")) {
                 String[] headersAndBody = part.split("\r\n\r\n", 2);
-                if (headersAndBody.length < 2) continue;
+                if (headersAndBody.length < 2)
+                    continue;
 
                 String headers = headersAndBody[0];
                 String body = headersAndBody[1].trim();
@@ -141,7 +144,8 @@ public class RegisterHandler implements HttpHandler {
                     }
                 }
 
-                if (name == null) continue;
+                if (name == null)
+                    continue;
 
                 if (filename != null && !filename.isEmpty()) {
                     // It's the image file
@@ -157,12 +161,13 @@ public class RegisterHandler implements HttpHandler {
         // ساخت شیء Seller
         Seller seller = new Seller();
         seller.setName(fields.get("firstName"));
+        seller.setfamilyName(fields.get("lastname"));
         seller.setEmail(fields.get("email"));
         seller.setPassword(fields.get("password"));
         seller.setShopName(fields.get("shopname"));
-        seller.setShopImage(imageBytes);  // ست کردن BLOB
+        seller.setShopImage(imageBytes); // ست کردن BLOB
 
-        Main.inserttodb(seller);  // ذخیره در دیتابیس
+        Main.inserttodb(seller); // ذخیره در دیتابیس
         sendSuccess(exchange);
     }
 

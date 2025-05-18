@@ -13,13 +13,13 @@ public class Seller extends User {
     @Column(name = "image", columnDefinition = "LONGBLOB")
     byte[] ShopImage;
 
-    public Seller(String name, String email, String password, String Shopname) {
-        super(name, email, password);
+    public Seller(String name, String lastname, String email, String password, String Shopname) {
+        super(name, lastname, email, password);
         Shopname = Shopname;
     }
 
     public Seller() {
-        super("", "", "");
+        super("","", "", "");
     }
 
     public void setShopName(String Shopname) {
