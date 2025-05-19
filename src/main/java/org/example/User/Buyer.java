@@ -12,7 +12,6 @@ public class Buyer extends User {
     public List<Cart> getPrev_orders() {
         return prev_orders;
     }
-/// hxhxhxcjcjcjc
     public void setPrev_orders(List<Cart> prev_orders) {
         this.prev_orders = prev_orders;
     }
