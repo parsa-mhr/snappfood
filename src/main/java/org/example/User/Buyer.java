@@ -1,9 +1,12 @@
 package org.example.User;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import org.example.Details.Cart;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Entity
+@Table (name = "Buyers")
 public class Buyer extends User {
     private  List<Cart> prev_orders = new ArrayList<Cart>();
     private List<Cart> Carts = new ArrayList<>() ;

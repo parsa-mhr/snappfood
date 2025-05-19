@@ -3,7 +3,7 @@ package org.example.User;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Courier")
+@Table(name = "Couriers")
 public class Courier extends User {
     @Id
     private Long id;
