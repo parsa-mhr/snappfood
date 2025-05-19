@@ -75,7 +75,7 @@ public class Main {
             session.close();
         }
     }
-
+//iuuythrge
     public static Seller getSellerBylogin(String email, String password) {
         try (Session session = sessionFactory.openSession()) {
             String hql = "FROM Seller s WHERE s.email = :email";
