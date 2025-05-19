@@ -21,6 +21,9 @@ public abstract class User {
     protected String password;
     @Column(unique = true, nullable = false)
     protected String phonenumber;
+    @Lob
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    byte[] Image;
 
     public User(String name, String familyName, String email, String password, String phonenumber) {
         this.name = name;
