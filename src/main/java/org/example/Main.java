@@ -16,6 +16,15 @@ public class Main {
     public static SessionFactory sessionFactory;
 
     public static void inserttodb(User user) {
+        String cardNumberRegex = "^\\d{16}$";
+        if (user instanceof Courier) {
+            Courier courier = (Courier) user;
+            if (!courier.getbankinformation().matches(cardNumberRegex)) {
+                System.out.println("Invalid card number format: " + courier.getbankinformation());
+                return;
+            }
+        }
+
         // اعتبارسنجی شماره تماس
         String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
         if (!user.getphonenumber().matches(phoneRegex)) {
@@ -88,6 +97,7 @@ public class Main {
         // connect to db
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
+        Scanner scanner = new Scanner(System.in);
 
         // اضافه کردن کلاس‌های Entity
         configuration.addAnnotatedClass(User.class);
@@ -99,7 +109,7 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/", new MainPageHandler());
         server.createContext("/user", new RegisterHandler());
-        server.createContext("/login" , new LoginHandler(sessionFactory)) ;
+        server.createContext("/login", new LoginHandler(sessionFactory));
         server.setExecutor(null);
         server.start();
         System.err.println("Server Started on port " + port + "...!");
