@@ -9,9 +9,6 @@ public class Seller extends User {
     private Long id;
     @Column(nullable = false)
     String Shopname;
-    @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
-    byte[] ShopImage;
 
     public Seller(String name, String lastname, String email, String password, String Shopname,String phonenumber) {
         super(name, lastname, email, password,phonenumber);
@@ -26,8 +23,8 @@ public class Seller extends User {
         this.Shopname = Shopname;
     }
 
-    public void setShopImage(byte[] ShopImage) {
-        this.ShopImage = ShopImage;
+    public void setImage(byte[] ShopImage) {
+        this.Image = ShopImage;
     }
 
     public String getShopname() {
@@ -35,6 +32,6 @@ public class Seller extends User {
     }
 
     public byte[] getShopImage() {
-        return ShopImage;
+        return Image;
     }
 }
