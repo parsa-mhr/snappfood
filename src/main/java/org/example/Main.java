@@ -75,7 +75,7 @@ public class Main {
             session.close();
         }
     }
-//
+
     public static Seller getSellerBylogin(String email, String password) {
         try (Session session = sessionFactory.openSession()) {
             String hql = "FROM Seller s WHERE s.email = :email";
@@ -93,7 +93,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        // کانفیگ Hibernate از فایل hibernate.cfg.xml می‌خوانیم
         // connect to db
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
@@ -102,6 +101,8 @@ public class Main {
         // اضافه کردن کلاس‌های Entity
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Seller.class);
+        configuration.addAnnotatedClass(Courier.class);
+        configuration.addAnnotatedClass(Buyer.class);
         sessionFactory = configuration.buildSessionFactory();
 
         // connect to server
