@@ -99,6 +99,7 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/", new MainPageHandler());
         server.createContext("/user", new RegisterHandler());
+        server.createContext("/login" , new LoginHandler(sessionFactory)) ;
         server.setExecutor(null);
         server.start();
         System.err.println("Server Started on port " + port + "...!");
