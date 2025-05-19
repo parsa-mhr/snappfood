@@ -114,6 +114,9 @@ public class LoginHandler implements HttpHandler{
             System.out.println("not exist");
         }else {
             System.out.println("login success");
+            if (Login instanceof Seller) {
+                System.out.println("seller");
+            }
         }
     }
     private Map<String, String> parseFormData(String formData) throws UnsupportedEncodingException {
