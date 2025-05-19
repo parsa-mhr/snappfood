@@ -75,6 +75,7 @@ public class Main {
             session.close();
         }
     }
+    //hfhgy
 //iuuythestdryfuihrge
     public static Seller getSellerBylogin(String email, String password) {
         try (Session session = sessionFactory.openSession()) {
