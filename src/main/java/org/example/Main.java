@@ -118,18 +118,5 @@ public class Main {
         server.setExecutor(null);
         server.start();
         System.err.println("Server Started on port " + port + "...!");
-        //test
-        try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            Buyer buyer = new Buyer("name" , "last"  , "mail@gmail.com" , "1234" , "09124357677");
-            Cart cart = new Cart(buyer);
-            session.save(buyer);
-            session.save(cart);
-            transaction.commit();
-            sleep(10000);
-            System.out.println("Cart updated" );
-            cart.setStatus(OrderStatus.Deliverd , sessionFactory);
-
-        }
     }
 }
