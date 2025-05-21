@@ -60,8 +60,12 @@ public class LoginApiHandler implements HttpHandler {
 
             String json = gson.toJson(Map.of(
                     "message", "Login successful",
-                    "userId", String.valueOf(user.getId()),
+                    "id", String.valueOf(user.getId()),
+                    "full_name" , String.valueOf(user.getFullName()),
+                    "phone" , String.valueOf(user.getPhonenumber()),
+                    "email" , String.valueOf(user.getEmail()),
                     "role", user.getRole().name(),
+                    "address" , user.getadress() ,
                     "token", "fake-jwt-token"
             ));
             sendJson(exchange, 200, json);
