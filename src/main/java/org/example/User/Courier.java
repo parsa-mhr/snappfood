@@ -3,13 +3,10 @@ package org.example.User;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Courier")
+@Table(name = "Couriers")
 public class Courier extends User {
     @Id
     private Long id;
-    @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
-    byte[] CourierImage;
     @Column(nullable = false, unique = true)
     String bankinformation;
 
@@ -32,11 +29,5 @@ public class Courier extends User {
         this.bankinformation = bankinformation;
     }
 
-    public byte[] getCourierImage() {
-        return CourierImage;
-    }
 
-    public void setCourierImage(byte[] CourierImage) {
-        this.CourierImage = CourierImage;
-    }
 }

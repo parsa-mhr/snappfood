@@ -168,7 +168,7 @@ public class RegisterHandler implements HttpHandler {
         seller.setEmail(fields.get("email"));
         seller.setPassword(fields.get("password"));
         seller.setShopName(fields.get("shopname"));
-        seller.setShopImage(imageBytes); // ست کردن BLOB
+        seller.setImage(imageBytes); // ست کردن BLOB
         System.out.println(seller);
         Main.inserttodb(seller); // ذخیره در دیتابیس
         sendSuccess(exchange);

@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.Details.Cart;
+import org.example.Details.OrderStatus;
 import org.example.Security.PasswordUtil;//
 import com.sun.net.httpserver.*;
 import org.hibernate.*;
@@ -11,6 +13,8 @@ import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static java.lang.Thread.sleep;
 
 public class Main {
     public static SessionFactory sessionFactory;
@@ -94,7 +98,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        // کانفیگ Hibernate از فایل hibernate.cfg.xml می‌خوانیم
         // connect to db
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
@@ -103,6 +106,8 @@ public class Main {
         // اضافه کردن کلاس‌های Entity
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Seller.class);
+        configuration.addAnnotatedClass(Courier.class);
+        configuration.addAnnotatedClass(Buyer.class);
         sessionFactory = configuration.buildSessionFactory();
 
         // connect to server
@@ -114,6 +119,5 @@ public class Main {
         server.setExecutor(null);
         server.start();
         System.err.println("Server Started on port " + port + "...!");
-
     }
 }
