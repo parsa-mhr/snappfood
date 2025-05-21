@@ -7,27 +7,26 @@ import jakarta.persistence.*;
 public class Courier extends User {
     @Id
     private Long id;
-    @Column(nullable = false, unique = true)
-    String bankinformation;
+    @Embedded
+    private BankInfo bankInfo;
 
-    public Courier(String name, String lastname, String email, String password, String phonenumber,
-            String bankinformation) {
-        super(name, lastname, email, password, phonenumber);
-        this.bankinformation = bankinformation;
+    public Courier(String fullName, String email, String password, String phonenumber,
+            String address, BankInfo bankInfo) {
+        super(fullName, email, password, phonenumber, address);
+        this.setRole(UserRole.courier);
+        this.bankInfo = bankInfo;
     }
 
     public Courier() {
-        super("", "", "", "", "");
-
+        super();
+        this.setRole(UserRole.courier);
     }
 
-    public String getbankinformation() {
-        return bankinformation;
+    public BankInfo getBankInfo() {
+        return bankInfo;
     }
 
-    public void setbankinformation(String bankinformation) {
-        this.bankinformation = bankinformation;
+    public void setBankInfo(BankInfo bankInfo) {
+        this.bankInfo = bankInfo;
     }
-
-
 }

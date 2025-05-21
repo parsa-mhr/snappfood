@@ -1,4 +1,5 @@
 package org.example.ServerHandlers;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Main;
@@ -15,18 +16,21 @@ import java.util.*;
 
 import static java.util.Objects.hash;
 
-public class LoginHandler implements HttpHandler{
-   static SessionFactory sessionFactory;
+public class LoginHandler implements HttpHandler {
+    static SessionFactory sessionFactory;
+
     public LoginHandler(SessionFactory SessionFactory) {
         sessionFactory = SessionFactory;
     }
+
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         if (method.equalsIgnoreCase("GET")) {
             loginForm(exchange);
         } else if (method.equalsIgnoreCase("POST")) {
-        loginVerify(exchange);
-            //to write a method or object for open a panel for user (in case of correct authorize)
+            loginVerify(exchange);
+            // to write a method or object for open a panel for user (in case of correct
+            // authorize)
         }
     }
 
@@ -93,6 +97,7 @@ public class LoginHandler implements HttpHandler{
             os.write(response.getBytes());
         }
     }
+
     private void loginVerify(HttpExchange exchange) throws IOException {
         // خواندن داده‌های ارسال شده از طریق POST
         InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "utf-8");
@@ -109,16 +114,17 @@ public class LoginHandler implements HttpHandler{
         String identifier = params.get("identifier");
         String password = params.get("password");
 
-        User Login = Login (identifier, password);
+        User Login = Login(identifier, password);
         if (Login == null) {
             System.out.println("not exist");
-        }else {
+        } else {
             System.out.println("login success");
             if (Login instanceof Seller) {
                 System.out.println("seller");
             }
         }
     }
+
     private Map<String, String> parseFormData(String formData) throws UnsupportedEncodingException {
         Map<String, String> map = new HashMap<>();
         String[] pairs = formData.split("&");
@@ -132,15 +138,16 @@ public class LoginHandler implements HttpHandler{
         }
         return map;
     }
-    //login
+
+    // login
     public static User Login(String identifier, String password) {
         User user = null;
-        String hql ;
+        String hql;
         try (Session session = sessionFactory.openSession()) {
             if (identifier.matches("^[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
                 System.out.println("Email login");
                 System.out.println(identifier);
-                 hql = "FROM User s WHERE s.email = :email ";
+                hql = "FROM User s WHERE s.email = :email ";
                 user = session.createQuery(hql, User.class)
                         .setParameter("email", identifier)
                         .uniqueResult();
@@ -149,7 +156,7 @@ public class LoginHandler implements HttpHandler{
                 if (user == null) {
                     System.out.println("not exist");
                 }
-            }else if (identifier.matches("^\\d{10,15}$")) {
+            } else if (identifier.matches("^\\d{10,15}$")) {
                 System.out.println("Phone login");
                 System.out.println(identifier);
                 hql = "FROM User s WHERE s.phonenumber = :phonenumber AND s.password = :password";

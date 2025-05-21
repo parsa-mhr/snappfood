@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Main;
 import org.example.User.Seller;
+import org.example.User.UserRole;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -78,12 +79,10 @@ public class RegisterHandler implements HttpHandler {
                     <div class="container">
                         <h2>ثبت نام</h2>
                         <form method="post" enctype="multipart/form-data">
-                            <label>نام:</label>
-                            <input name="firstName" type="text" required /0>
-                            <label>نام خانوادگی:</label>
-                            <input name="lastname" type="text" required /0>
+                            <label>نام و نام خانوادگی:</label>
+                            <input name="fullname" type="text" required /0>
                             <label>شماره تماس:</label>
-                            <input name="phonenumber" type="text" required /0>                            
+                            <input name="phonenumber" type="text" required /0>
                             <label>رمز عبور:</label>
                             <input name="password" type="password" required />
                             <label>ایمیل:</label>
@@ -92,6 +91,10 @@ public class RegisterHandler implements HttpHandler {
                             <input name="shopname" type="text" required />
                             <label>آپلود تصویر:</label>
                             <input name="image" type="file" accept="image/*" required />
+                            <label>آدرس:</label>
+                            <input name="adress" type="text" required />
+                            <label>نقش:</label>
+                            <input name="role" type="text" required />
                             <button type="submit">ارسال کد</button>
                         </form>
                     </div>
@@ -162,13 +165,14 @@ public class RegisterHandler implements HttpHandler {
 
         // ساخت شیء Seller
         Seller seller = new Seller();
-        seller.setName(fields.get("firstName"));
-        seller.setfamilyName(fields.get("lastname"));
-        seller.setphonenumber(fields.get("phonenumber"));
+        seller.setFullName(fields.get("fullname"));
+        seller.setPhonenumber(fields.get("phonenumber"));
         seller.setEmail(fields.get("email"));
         seller.setPassword(fields.get("password"));
         seller.setShopName(fields.get("shopname"));
-        seller.setImage(imageBytes); // ست کردن BLOB
+        seller.setImage(imageBytes);
+        seller.setadress(fields.get("adress"));
+        seller.setRole(UserRole.valueOf(fields.get("role")));
         System.out.println(seller);
         Main.inserttodb(seller); // ذخیره در دیتابیس
         sendSuccess(exchange);

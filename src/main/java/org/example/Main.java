@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.ApiHandlers.LoginApiHandler;
+import org.example.ApiHandlers.RegisterApiHandler;
 import org.example.Details.Cart;
 import org.example.Details.OrderStatus;
 import org.example.Security.PasswordUtil;//
@@ -21,22 +23,25 @@ public class Main {
 
     public static void inserttodb(User user) {
         String cardNumberRegex = "^\\d{16}$";
-        if (user instanceof Courier) {
-            Courier courier = (Courier) user;
-            if (!courier.getbankinformation().matches(cardNumberRegex)) {
-                System.out.println("Invalid card number format: " + courier.getbankinformation());
+
+        if (user instanceof Courier courier) {
+            BankInfo bankInfo = courier.getBankInfo();
+            if (bankInfo == null || bankInfo.getAccountNumber() == null ||
+                    !bankInfo.getAccountNumber().matches(cardNumberRegex)) {
+                System.out.println("Invalid card number format: " +
+                        (bankInfo != null ? bankInfo.getAccountNumber() : "null"));
                 return;
             }
         }
 
         // اعتبارسنجی شماره تماس
         String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
-        if (!user.getphonenumber().matches(phoneRegex)) {
-            System.out.println("Invalid phone number format: " + user.getphonenumber());
+        if (!user.getPhonenumber().matches(phoneRegex)) {
+            System.out.println("Invalid phone number format: " + user.getPhonenumber());
             return; // شماره نامعتبر است، ذخیره انجام نمی‌شود
         }
-        String emailRegex = "^[a-zA-Z0-9._%+-]+@gmail\\.com$";
-        if (!user.getEmail().matches(emailRegex)) {
+        String regexp = "^[\\w\\.-]+@([\\w-]+\\.)+[A-Za-z]{2,}$";
+        if (!user.getEmail().matches(regexp)) {
             System.out.println("Invalid email format: " + user.getEmail());
             return;
         }
@@ -60,11 +65,11 @@ public class Main {
             // بررسی وجود کاربر با شماره تماس مشابه
             String phoneHql = "FROM User u WHERE u.phonenumber = :phonenumber";
             User existingUserByPhone = session.createQuery(phoneHql, User.class)
-                    .setParameter("phonenumber", user.getphonenumber())
+                    .setParameter("phonenumber", user.getPhonenumber())
                     .uniqueResult();
 
             if (existingUserByPhone != null) {
-                System.out.println("User with phone number " + user.getphonenumber() + " already exists.");
+                System.out.println("User with phone number " + user.getPhonenumber() + " already exists.");
                 return;
             }
             user.setPassword(PasswordUtil.hashPassword(user.getPassword()));// هش کردن پسورد
@@ -79,8 +84,7 @@ public class Main {
             session.close();
         }
     }
-    //hfhgy
-//iuuythestdryfuihrge
+
     public static Seller getSellerBylogin(String email, String password) {
         try (Session session = sessionFactory.openSession()) {
             String hql = "FROM Seller s WHERE s.email = :email";
@@ -113,9 +117,9 @@ public class Main {
         // connect to server
         int port = 8080;
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/", new MainPageHandler());
-        server.createContext("/user", new RegisterHandler());
-        server.createContext("/login", new LoginHandler(sessionFactory));
+        server.createContext("/auth/register", new RegisterApiHandler(sessionFactory));
+        server.createContext("/auth/login", new LoginApiHandler(sessionFactory));
+
         server.setExecutor(null);
         server.start();
         System.err.println("Server Started on port " + port + "...!");
