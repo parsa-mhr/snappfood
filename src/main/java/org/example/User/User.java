@@ -36,12 +36,6 @@ public abstract class User {
     @Column(nullable = true)
     protected String adress;
 
-    @Column(nullable = true)
-    protected String bankName;
-
-    @Column(nullable = true)
-    protected String accountNumber;
-
     public User(String fullName, String email, String password, String phonenumber, String adress) {
         this.fullName = fullName;
         this.email = email;

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.User.*;
+import org.example.Security.PasswordUtil;//
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -68,15 +69,20 @@ public class RegisterApiHandler implements HttpHandler {
             // ساخت یوزر با توجه به نقش
             User user;
             switch (role) {
+
                 case "seller" -> {
+                    String hashedPassword = PasswordUtil.hashPassword(password);
                     String shopName = (String) body.get("shopName");
                     if (shopName == null) {
                         sendResponse(exchange, 400, "Missing shopName for seller");
                         return;
                     }
-                    user = new Seller(fullName, email, password, phone, shopName, address);
+                    user = new Seller(fullName, email, hashedPassword, phone, shopName, address);
+                    user.setRole(UserRole.valueOf(role));
+
                 }
                 case "courier" -> {
+                    String hashedPassword = PasswordUtil.hashPassword(password);
                     Map<String, Object> bankInfoMap = (Map<String, Object>) body.get("bankInfo");
 
                     if (bankInfoMap == null || bankInfoMap.get("accountNumber") == null
@@ -89,10 +95,18 @@ public class RegisterApiHandler implements HttpHandler {
                             (String) bankInfoMap.get("bankName"),
                             (String) bankInfoMap.get("accountNumber"));
 
-                    user = new Courier(fullName, email, password, phone, address, bankInfo);
+                    user = new Courier(fullName, email, hashedPassword, phone, address, bankInfo);
+                    user.setRole(UserRole.valueOf(role));
+
                 }
 
-                case "buyer" -> user = new Buyer(fullName, email, password, phone, address);
+                case "buyer" -> {
+                    String hashedPassword = PasswordUtil.hashPassword(password);
+                    user = new Buyer(fullName, email, hashedPassword, phone, address);
+                    user.setRole(UserRole.valueOf(role));
+
+                }
+
                 default -> {
                     sendResponse(exchange, 400, "Invalid role");
                     return;

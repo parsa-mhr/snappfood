@@ -25,7 +25,7 @@ public class Main {
         String cardNumberRegex = "^\\d{16}$";
 
         if (user instanceof Courier courier) {
-            BankInfo bankInfo = courier.getBankInfo();
+            BankInfo bankInfo = courier.getBankInformation();
             if (bankInfo == null || bankInfo.getAccountNumber() == null ||
                     !bankInfo.getAccountNumber().matches(cardNumberRegex)) {
                 System.out.println("Invalid card number format: " +

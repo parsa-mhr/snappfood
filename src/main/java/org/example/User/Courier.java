@@ -8,25 +8,26 @@ public class Courier extends User {
     @Id
     private Long id;
     @Embedded
-    private BankInfo bankInfo;
-
-    public Courier(String fullName, String email, String password, String phonenumber,
-            String address, BankInfo bankInfo) {
-        super(fullName, email, password, phonenumber, address);
-        this.setRole(UserRole.courier);
-        this.bankInfo = bankInfo;
-    }
+    @AttributeOverrides({
+            @AttributeOverride(name = "bankName", column = @Column(name = "bank_name")),
+            @AttributeOverride(name = "accountNumber", column = @Column(name = "account_number"))
+    })
+    private BankInfo bankInformation;
 
     public Courier() {
         super();
-        this.setRole(UserRole.courier);
     }
 
-    public BankInfo getBankInfo() {
-        return bankInfo;
+    public Courier(String name, String email, String password, String phone, String address, BankInfo bankInformation) {
+        super(name, email, password, phone, address);
+        this.bankInformation = bankInformation;
     }
 
-    public void setBankInfo(BankInfo bankInfo) {
-        this.bankInfo = bankInfo;
+    public BankInfo getBankInformation() {
+        return bankInformation;
+    }
+
+    public void setBankInformation(BankInfo bankInformation) {
+        this.bankInformation = bankInformation;
     }
 }

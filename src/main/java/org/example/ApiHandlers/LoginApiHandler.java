@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Security.PasswordUtil;
+import org.example.User.Courier;
 import org.example.User.User;
 import org.example.User.UserRole;
 import org.hibernate.Session;
@@ -11,6 +12,7 @@ import org.hibernate.SessionFactory;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LoginApiHandler implements HttpHandler {
@@ -25,13 +27,13 @@ public class LoginApiHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         try {
             if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {
-                sendJson(exchange, 405, "Method Not Allowed");
+                sendJson(exchange, 405, jsonMessage("Method Not Allowed"));
                 return;
             }
 
             String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
             if (contentType == null || !contentType.contains("application/json")) {
-                sendJson(exchange, 400, "Content-Type must be application");
+                sendJson(exchange, 400, jsonMessage("Content-Type must be application/json"));
                 return;
             }
 
@@ -43,7 +45,7 @@ public class LoginApiHandler implements HttpHandler {
             String password = body.get("password");
 
             if (phone == null || password == null) {
-                sendJson(exchange, 400, "Phone and password are required");
+                sendJson(exchange, 400, jsonMessage("Phone and password are required"));
                 return;
             }
 
@@ -54,21 +56,38 @@ public class LoginApiHandler implements HttpHandler {
             session.close();
 
             if (user == null || !PasswordUtil.checkPassword(password, user.getPassword())) {
-                sendJson(exchange, 401, "Invalid phone or password");
+                sendJson(exchange, 401, jsonMessage("Invalid phone or password"));
                 return;
             }
 
-            String json = gson.toJson(Map.of(
-                    "message", "Login successful",
-                    "userId", String.valueOf(user.getId()),
-                    "role", user.getRole().name(),
-                    "token", "fake-jwt-token"
-            ));
+            Map<String, Object> userMap = new LinkedHashMap<>();
+            userMap.put("id", user.getId());
+            userMap.put("full_name", user.getFullName());
+            userMap.put("phone", user.getPhonenumber());
+            userMap.put("email", user.getEmail());
+            userMap.put("role", user.getRole().name());
+            userMap.put("address", user.getadress());
+            userMap.put("profileImageBase64", user.getProfileImageBase64());
+
+            // اگر اطلاعات بانکی داشته باشه (مثلاً courier)
+            if (user instanceof Courier courier && courier.getBankInformation() != null) {
+                Map<String, String> bankMap = new LinkedHashMap<>();
+                bankMap.put("bank_name", courier.getBankInformation().getBankName());
+                bankMap.put("account_number", courier.getBankInformation().getAccountNumber());
+                userMap.put("bank_info", bankMap);
+            }
+
+            Map<String, Object> responseMap = new LinkedHashMap<>();
+            responseMap.put("message", "Login successful");
+            responseMap.put("token", "fake-jwt-token"); // توکن واقعی در نسخه نهایی
+            responseMap.put("user", userMap);
+
+            String json = gson.toJson(responseMap);
             sendJson(exchange, 200, json);
 
         } catch (Exception e) {
             e.printStackTrace();
-            sendJson(exchange, 500, "Internal Server Error");
+            sendJson(exchange, 500, jsonMessage("Internal Server Error"));
         }
     }
 
@@ -83,5 +102,9 @@ public class LoginApiHandler implements HttpHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String jsonMessage(String msg) {
+        return new Gson().toJson(Map.of("error", msg));
     }
 }
