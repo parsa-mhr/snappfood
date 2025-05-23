@@ -1,6 +1,7 @@
 package org.example.User;
 
 import jakarta.persistence.*;
+import org.example.Security.PasswordUtil;
 
 @Entity
 @Table(name = "users")
@@ -13,7 +14,7 @@ public abstract class User {
     @Column(nullable = false)
     protected String fullName;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     protected String email;
 
     @Column(nullable = false)
@@ -39,7 +40,14 @@ public abstract class User {
     public User(String fullName, String email, String password, String phonenumber, String adress) {
         this.fullName = fullName;
         this.email = email;
-        this.password = password;
+        this.password = PasswordUtil.hashPassword(password);
+        this.phonenumber = phonenumber;
+        this.adress = adress;
+    }
+    public User(String fullName, String password, String phonenumber, String adress) {
+        this.fullName = fullName;
+        this.email = null;
+        this.password = PasswordUtil.hashPassword(password);
         this.phonenumber = phonenumber;
         this.adress = adress;
     }

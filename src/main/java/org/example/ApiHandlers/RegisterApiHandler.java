@@ -50,7 +50,7 @@ public class RegisterApiHandler implements HttpHandler {
             String role = (String) body.get("role");
             String profileImageBase64 = (String) body.get("profileImageBase64");
 
-            if (fullName == null || email == null || password == null ||
+            if (fullName == null || password == null ||
                     phone == null || address == null || role == null) {
                 sendResponse(exchange, 400, "Missing required fields");
                 return;
@@ -139,7 +139,7 @@ public class RegisterApiHandler implements HttpHandler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            sendResponse(exchange, 500, "Internal Server Error");
+            sendResponse(exchange, 400, "Invalid input");
         }
     }
 
