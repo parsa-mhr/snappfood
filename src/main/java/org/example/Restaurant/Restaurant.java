@@ -1,11 +1,14 @@
 package org.example.Restaurant;
 
 import jakarta.persistence.*;
+import org.example.User.Seller;
+import org.hibernate.Session;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "Resturant")
+@Table(name = "Resturants")
 
 public abstract class Restaurant {
 
@@ -32,19 +35,26 @@ public abstract class Restaurant {
     @Column(name = "logo", columnDefinition = "LONGBLOB")
     private byte[] logo;
 
+    @ManyToOne
+    private Seller seller;
+
     @Transient
     private String profileImageBase64;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MenuItem> menuItems = new ArrayList<>();
+    @Transient
+    private Menu menu;
+
+//    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<MenuItem> menuItems = new ArrayList<>();
 
     public Restaurant() {
     }
 
-    public Restaurant(String name, String address, String phone) {
+    public Restaurant(String name, String address, String phone , Seller seller ) {
         this.name = name;
         this.address = address;
         this.phone = phone;
+        this.seller = seller;
     }
 
     public Long getId() {
@@ -106,12 +116,19 @@ public abstract class Restaurant {
     public void setProfileImageBase64(String profileImageBase64) {
         this.profileImageBase64 = profileImageBase64;
     }
+//
+//    public List<MenuItem> getMenuItems() {
+//        return menuItems;
+//    }
+//
+//    public void setMenuItems(List<MenuItem> menuItems) {
+//        this.menuItems = menuItems;
+//    }
+public void loadMenu(Session session) {
+    this.menu = new Menu(this.id, session);
+}
 
-    public List<MenuItem> getMenuItems() {
-        return menuItems;
-    }
-
-    public void setMenuItems(List<MenuItem> menuItems) {
-        this.menuItems = menuItems;
+    public Menu getMenu() {
+        return menu;
     }
 }

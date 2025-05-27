@@ -33,6 +33,9 @@
         <mapping class = "org.example.User.Buyer"/>
         <mapping class = "org.example.User.Courier"/>
         <mapping class = "org.example.Details.Cart"/>
+        <mapping class = "org.example.Restaurant.MenuItem"/>
+        <mapping class = "org.example.Restaurant.Restaurant"/>
+
         <!-- یا -->
         <!-- <mapping resource="yourEntity.hbm.xml"/> -->
     </session-factory>

@@ -34,8 +34,8 @@ public class MenuItem {
     @Column(nullable = false)
     private String category;
 
-    @ElementCollection
-    private List<String> keywords = new ArrayList<>();
+//    @ElementCollection
+//    private List<String> keywords = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
@@ -44,14 +44,14 @@ public class MenuItem {
     public MenuItem() {
     }
 
-    public MenuItem(String title, String description, int price, int inventory, String category, List<String> keywords,
+    public MenuItem(String title, String description, int price, int inventory, String category/* , List<String> keywords*/,
             Restaurant restaurant) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.inventory = inventory;
         this.category = category;
-        this.keywords = keywords;
+       // this.keywords = keywords;
         this.restaurant = restaurant;
     }
 
@@ -117,13 +117,13 @@ public class MenuItem {
         this.category = category;
     }
 
-    public List<String> getKeywords() {
-        return keywords;
-    }
+//    public List<String> getKeywords() {
+//        return keywords;
+//    }
 
-    public void setKeywords(List<String> keywords) {
-        this.keywords = keywords;
-    }
+//    public void setKeywords(List<String> keywords) {
+//        this.keywords = keywords;
+//    }
 
     public Restaurant getRestaurant() {
         return restaurant;

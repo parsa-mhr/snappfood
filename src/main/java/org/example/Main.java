@@ -4,12 +4,16 @@ import org.example.ApiHandlers.LoginApiHandler;
 import org.example.ApiHandlers.RegisterApiHandler;
 import org.example.Details.Cart;
 import org.example.Details.OrderStatus;
+import org.example.Restaurant.MenuItem;
+import org.example.Restaurant.Restaurant;
 import org.example.Security.PasswordUtil;//
 import com.sun.net.httpserver.*;
 import org.hibernate.*;
 import org.hibernate.cfg.*;
 import org.example.ServerHandlers.*;
 import org.example.User.*;
+
+import java.awt.*;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
@@ -112,7 +116,12 @@ public class Main {
         configuration.addAnnotatedClass(Seller.class);
         configuration.addAnnotatedClass(Courier.class);
         configuration.addAnnotatedClass(Buyer.class);
+        configuration.addAnnotatedClass(Cart.class);
+        configuration.addAnnotatedClass(MenuItem.class);
+        configuration.addAnnotatedClass(Restaurant.class);
+
         sessionFactory = configuration.buildSessionFactory();
+
 
         // connect to server
         int port = 8080;

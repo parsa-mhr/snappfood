@@ -2,6 +2,8 @@ package org.example.User;
 
 import jakarta.persistence.*;
 import org.example.Details.Cart;
+import org.example.Restaurant.MenuItem;
+import org.hibernate.Session;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,21 @@ public class Buyer extends User {
     public Buyer() {
         super();
         this.setRole(UserRole.buyer);
+    }
+    public List<Cart> pendingCarts (Session session) {
+        String hql = "FROM Cart c WHERE c.buyer = :uid AND c.Status = 'Pending'";
+        return session.createQuery(hql, Cart.class)
+                .setParameter("uid", this.getId())
+                .list();
+    }
+    public List<Cart> DeliveredCarts (Session session) {
+        String hql = "FROM Cart c WHERE c.buyer = :uid AND c.Status = 'Delivered'";
+        return session.createQuery(hql , Cart.class).setParameter(":uid" , this.getId()).list();
+    }
+    public Cart getCurrent_order (Session session) {
+            String hql = "FROM Cart c WHERE c.buyer = :uid AND c.Status = 'Current'";
+            return (Cart) session.createQuery(hql, Cart.class).uniqueResult();
+
     }
 
 }

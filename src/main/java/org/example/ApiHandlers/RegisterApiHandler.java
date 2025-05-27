@@ -72,12 +72,7 @@ public class RegisterApiHandler implements HttpHandler {
 
                 case "seller" -> {
                     String hashedPassword = PasswordUtil.hashPassword(password);
-                    String shopName = (String) body.get("shopName");
-                    if (shopName == null) {
-                        sendResponse(exchange, 400, "Missing shopName for seller");
-                        return;
-                    }
-                    user = new Seller(fullName, email, hashedPassword, phone, shopName, address);
+                    user = new Seller(fullName, email, hashedPassword, phone, address);
                     user.setRole(UserRole.valueOf(role));
 
                 }

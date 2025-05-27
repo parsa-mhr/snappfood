@@ -169,7 +169,6 @@ public class RegisterHandler implements HttpHandler {
         seller.setPhonenumber(fields.get("phonenumber"));
         seller.setEmail(fields.get("email"));
         seller.setPassword(fields.get("password"));
-        seller.setShopName(fields.get("shopname"));
         seller.setImage(imageBytes);
         seller.setadress(fields.get("adress"));
         seller.setRole(UserRole.valueOf(fields.get("role")));

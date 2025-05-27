@@ -15,10 +15,12 @@ public class Cart {
     // arraylist of foods (when food class includes)
     // Restaurant restaurant ;
     @ManyToOne
-    @JoinColumn(name = "User" , nullable = false , referencedColumnName = "id")
+    @JoinColumn(name = "User" , nullable = false , referencedColumnName = "Userid")
     Buyer buyer;
     @Enumerated(EnumType.STRING)
     OrderStatus Status ;
+    @Enumerated (EnumType.STRING)
+    OrderStatus CurrentOrderStarts ;
     public Cart(Buyer buyer) {
         this.buyer = buyer;
         this.Status = OrderStatus.Pending;
@@ -30,6 +32,9 @@ public class Cart {
     }
     public void setStatus(OrderStatus Status , SessionFactory sessionFactory) {
         this.Status = Status;
+        if (Status == OrderStatus.Current_Order && CurrentOrderStarts == null) {
+            CurrentOrderStarts = OrderStatus.ACCEPTED ;
+        }
         Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
         sessionFactory.getCurrentSession().saveOrUpdate(this);
         transaction.commit();
