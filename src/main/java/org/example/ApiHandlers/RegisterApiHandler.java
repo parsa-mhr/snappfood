@@ -10,12 +10,13 @@ import org.example.Validation.CheckUser;
 import org.example.invalidFieldName.InvalidFieldException;
 import org.example.AlredyExist.AlredyExistException;
 import org.hibernate.SessionFactory;
-
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import org.example.Security.jwtSecurity;
 
 public class RegisterApiHandler implements HttpHandler {
 
@@ -98,12 +99,17 @@ public class RegisterApiHandler implements HttpHandler {
             // ذخیره در دیتابیس
             UserDAO dao = new UserDAO(sessionFactory);
             dao.save(user);
+            Long userId = user.getId(); // ⬅️ فقط بعد از save استفاده کن
+            String token = jwtSecurity.generateToken(user.getId(), user.getRole().name());
+
+            Map<String, Object> responseMap = new LinkedHashMap<>();
+            responseMap.put("message", "Login successful");
+            responseMap.put("user_id", user.getId());
+            responseMap.put("token", token);
+            String json = gson.toJson(responseMap);
 
             // پاسخ موفق
-            sendJson(exchange, 200, gson.toJson(Map.of(
-                    "message", "User registered successfully",
-                    "userId", user.getId(),
-                    "token", "fake-jwt-token")));
+            sendJson(exchange, 200, json);
 
         } catch (InvalidFieldException | AlredyExistException e) {
             sendJson(exchange, 400, jsonError(e.getMessage()));

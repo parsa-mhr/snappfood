@@ -3,10 +3,10 @@ package org.example.User;
 import jakarta.persistence.*;
 
 @Entity
+@PrimaryKeyJoinColumn(name = "id") // ✅ این خط مهمه
 @Table(name = "Couriers")
 public class Courier extends User {
-    @Id
-    private Long id;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "bankName", column = @Column(name = "bank_name")),
@@ -31,3 +31,4 @@ public class Courier extends User {
         this.bankInformation = bankInformation;
     }
 }
+    
