@@ -4,7 +4,7 @@ import org.example.ApiHandlers.LoginApiHandler;
 import org.example.ApiHandlers.RegisterApiHandler;
 import org.example.Details.Cart;
 import org.example.Details.OrderStatus;
-import org.example.Security.PasswordUtil;//
+import org.example.Security.PasswordUtil;
 import com.sun.net.httpserver.*;
 import org.hibernate.*;
 import org.hibernate.cfg.*;
@@ -20,70 +20,6 @@ import static java.lang.Thread.sleep;
 
 public class Main {
     public static SessionFactory sessionFactory;
-
-    public static void inserttodb(User user) {
-        String cardNumberRegex = "^\\d{16}$";
-
-        if (user instanceof Courier courier) {
-            BankInfo bankInfo = courier.getBankInformation();
-            if (bankInfo == null || bankInfo.getAccountNumber() == null ||
-                    !bankInfo.getAccountNumber().matches(cardNumberRegex)) {
-                System.out.println("Invalid card number format: " +
-                        (bankInfo != null ? bankInfo.getAccountNumber() : "null"));
-                return;
-            }
-        }
-
-        // اعتبارسنجی شماره تماس
-        String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
-        if (!user.getPhonenumber().matches(phoneRegex)) {
-            System.out.println("Invalid phone number format: " + user.getPhonenumber());
-            return; // شماره نامعتبر است، ذخیره انجام نمی‌شود
-        }
-        String regexp = "^[\\w\\.-]+@([\\w-]+\\.)+[A-Za-z]{2,}$";
-        if (!user.getEmail().matches(regexp)) {
-            System.out.println("Invalid email format: " + user.getEmail());
-            return;
-        }
-
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-
-            // بررسی وجود کاربر با ایمیل مشابه
-            String emailHql = "FROM User u WHERE u.email = :email";
-            User existingUserByEmail = session.createQuery(emailHql, User.class)
-                    .setParameter("email", user.getEmail())
-                    .uniqueResult();
-
-            if (existingUserByEmail != null) {
-                System.out.println("User with email " + user.getEmail() + " already exists.");
-                return;
-            }
-
-            // بررسی وجود کاربر با شماره تماس مشابه
-            String phoneHql = "FROM User u WHERE u.phonenumber = :phonenumber";
-            User existingUserByPhone = session.createQuery(phoneHql, User.class)
-                    .setParameter("phonenumber", user.getPhonenumber())
-                    .uniqueResult();
-
-            if (existingUserByPhone != null) {
-                System.out.println("User with phone number " + user.getPhonenumber() + " already exists.");
-                return;
-            }
-            user.setPassword(PasswordUtil.hashPassword(user.getPassword()));// هش کردن پسورد
-            session.save(user);
-            transaction.commit();
-            System.out.println("User saved with ID: " + user.getId());
-        } catch (Exception e) {
-            if (transaction != null)
-                transaction.rollback();
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
-    }
 
     public static Seller getSellerBylogin(String email, String password) {
         try (Session session = sessionFactory.openSession()) {

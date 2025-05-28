@@ -3,12 +3,14 @@ package org.example.ApiHandlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.example.User.*;
+import org.example.DAO.UserDAO;
 import org.example.Security.PasswordUtil;
-import org.hibernate.Session;
+import org.example.User.*;
+import org.example.Validation.CheckUser;
+import org.example.invalidFieldName.InvalidFieldException;
+import org.example.AlredyExist.AlredyExistException;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import java.io.IOException;
+
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -27,13 +29,13 @@ public class RegisterApiHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         try {
             if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {
-                sendResponse(exchange, 405, "Method Not Allowed");
+                sendJson(exchange, 405, jsonError("Method Not Allowed"));
                 return;
             }
 
             String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
             if (contentType == null || !contentType.contains("application/json")) {
-                sendResponse(exchange, 400, "Content-Type must be application/json");
+                sendJson(exchange, 400, jsonError("Content-Type must be application/json"));
                 return;
             }
 
@@ -41,7 +43,7 @@ public class RegisterApiHandler implements HttpHandler {
             Map<String, Object> body = gson.fromJson(
                     new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8), Map.class);
 
-            // فیلدهای اجباری
+            // استخراج داده‌ها
             String fullName = (String) body.get("fullName");
             String email = (String) body.get("email");
             String password = (String) body.get("password");
@@ -49,66 +51,39 @@ public class RegisterApiHandler implements HttpHandler {
             String address = (String) body.get("address");
             String role = (String) body.get("role");
             String profileImageBase64 = (String) body.get("profileImageBase64");
-
-            if (fullName == null || password == null ||
-                    phone == null || address == null || role == null) {
-                sendResponse(exchange, 400, "Missing required fields");
-                return;
-            }
+            String hashedPassword = PasswordUtil.hashPassword(password);
 
             byte[] imageBytes = null;
             if (profileImageBase64 != null) {
-                try {
-                    imageBytes = Base64.getDecoder().decode(profileImageBase64);
-                } catch (Exception e) {
-                    sendResponse(exchange, 400, "Invalid base64 for image");
-                    return;
-                }
+                imageBytes = Base64.getDecoder().decode(profileImageBase64);
+            }
+            if (password == null) {
+                throw new InvalidFieldException("Password");
             }
 
-            // ساخت یوزر با توجه به نقش
             User user;
+
             switch (role) {
-
                 case "seller" -> {
-                    String hashedPassword = PasswordUtil.hashPassword(password);
-                    String shopName = (String) body.get("shopName");
-                    if (shopName == null) {
-                        sendResponse(exchange, 400, "Missing shopName for seller");
-                        return;
-                    }
-                    user = new Seller(fullName, email, hashedPassword, phone, shopName, address);
-                    user.setRole(UserRole.valueOf(role));
-
+                    user = new Seller(fullName, email, hashedPassword, phone, address);
+                    user.setRole(UserRole.seller);
                 }
                 case "courier" -> {
-                    String hashedPassword = PasswordUtil.hashPassword(password);
-                    Map<String, Object> bankInfoMap = (Map<String, Object>) body.get("bankInfo");
-
-                    if (bankInfoMap == null || bankInfoMap.get("accountNumber") == null
-                            || bankInfoMap.get("bankName") == null) {
-                        sendResponse(exchange, 400, "Missing bankInformation for courier");
-                        return;
+                    BankInfo bankInfo = null;
+                    if (body.get("bankInfo") instanceof Map<?, ?> bankInfoMap) {
+                        bankInfo = new BankInfo(
+                                (String) bankInfoMap.get("bankName"),
+                                (String) bankInfoMap.get("accountNumber"));
                     }
-
-                    BankInfo bankInfo = new BankInfo(
-                            (String) bankInfoMap.get("bankName"),
-                            (String) bankInfoMap.get("accountNumber"));
-
                     user = new Courier(fullName, email, hashedPassword, phone, address, bankInfo);
-                    user.setRole(UserRole.valueOf(role));
-
+                    user.setRole(UserRole.courier);
                 }
-
                 case "buyer" -> {
-                    String hashedPassword = PasswordUtil.hashPassword(password);
                     user = new Buyer(fullName, email, hashedPassword, phone, address);
-                    user.setRole(UserRole.valueOf(role));
-
+                    user.setRole(UserRole.buyer);
                 }
-
                 default -> {
-                    sendResponse(exchange, 400, "Invalid role");
+                    sendJson(exchange, 400, jsonError("Invalid role"));
                     return;
                 }
             }
@@ -116,56 +91,45 @@ public class RegisterApiHandler implements HttpHandler {
             user.setImage(imageBytes);
             user.setProfileImageBase64(profileImageBase64);
 
-            Session session = sessionFactory.openSession();
-            Transaction tx = session.beginTransaction();
-            User existingUser = session.createQuery("FROM User WHERE phonenumber = :phone", User.class)
-                    .setParameter("phone", phone)
-                    .uniqueResult();
+            // اعتبارسنجی متمرکز
+            CheckUser validator = new CheckUser(sessionFactory);
+            validator.validate(user, profileImageBase64);
 
-            if (existingUser != null) {
-                session.close();
-                sendJson(exchange, 409, "Phone number already exist");
-                return;
-            }
-            session.save(user);
-            tx.commit();
-            session.close();
+            // ذخیره در دیتابیس
+            UserDAO dao = new UserDAO(sessionFactory);
+            dao.save(user);
 
-            String json = gson.toJson(Map.of(
+            // پاسخ موفق
+            sendJson(exchange, 200, gson.toJson(Map.of(
                     "message", "User registered successfully",
                     "userId", user.getId(),
-                    "token", "fake-jwt-token"));
-            sendJson(exchange, 200, json);
+                    "token", "fake-jwt-token")));
 
+        } catch (InvalidFieldException | AlredyExistException e) {
+            sendJson(exchange, 400, jsonError(e.getMessage()));
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            sendJson(exchange, 500, jsonError("Database error: " + e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
-            sendResponse(exchange, 400, "Invalid input");
-        }
-    }
-
-    private void sendResponse(HttpExchange exchange, int code, String msg) {
-        try {
-            byte[] res = msg.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "text/plain");
-            exchange.sendResponseHeaders(code, res.length);
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(res);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            sendJson(exchange, 500, jsonError("Internal Server Error"));
         }
     }
 
     private void sendJson(HttpExchange exchange, int code, String json) {
         try {
             byte[] res = json.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json");
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(code, res.length);
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(res);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String jsonError(String msg) {
+        return new Gson().toJson(Map.of("error", msg));
     }
 }
