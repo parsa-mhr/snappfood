@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.ApiHandlers.LoginApiHandler;
+import org.example.ApiHandlers.LogoutApiHandler;
 import org.example.ApiHandlers.ProfileApiHandler;
 import org.example.ApiHandlers.RegisterApiHandler;
 import org.example.Details.Cart;
@@ -62,8 +63,8 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/auth/register", new RegisterApiHandler(sessionFactory));
         server.createContext("/auth/login", new LoginApiHandler(sessionFactory));
-        server.createContext("/auth/profile", new ProfileApiHandler());
-        server.createContext("/auth/logout", new LoginApiHandler(sessionFactory));
+        server.createContext("/auth/profile", new ProfileApiHandler(sessionFactory));
+        server.createContext("/auth/logout", new LogoutApiHandler());
 
         server.setExecutor(null);
         server.start();

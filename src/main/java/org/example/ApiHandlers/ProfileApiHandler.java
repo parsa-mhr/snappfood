@@ -33,6 +33,7 @@ public class ProfileApiHandler implements HttpHandler {
         try {
             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
+
             // اعتبارسنجی توکن
             TokenUserValidator validator = new TokenUserValidator(sessionFactory);
             User user = validator.validate(authHeader);
@@ -48,7 +49,8 @@ public class ProfileApiHandler implements HttpHandler {
 
         } catch (UnauthorizedException e) {
             sendJson(exchange, 401, jsonError(e.getMessage()));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             sendJson(exchange, 500, jsonError("Internal Server Error"));
         }

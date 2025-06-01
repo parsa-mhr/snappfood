@@ -27,7 +27,7 @@ public class TokenUserValidator {
         Long userId;
         String jti = jwtSecurity.getJti(token);
         if (TokenBlacklist.isBlacklisted(jti)) {
-            throw new RuntimeException("Token is blacklisted. Please log in again.");
+            throw new UnauthorizedException();
         }
         try {
             userId = jwtSecurity.getUserId(token); // این متد JWT رو verify می‌کنه
