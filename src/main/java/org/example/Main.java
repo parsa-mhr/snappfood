@@ -57,6 +57,7 @@ public class Main {
         server.createContext("/auth/register", new RegisterApiHandler(sessionFactory));
         server.createContext("/auth/login", new LoginApiHandler(sessionFactory));
         server.createContext("/auth/profile", new ProfileApiHandler(sessionFactory));
+        server.createContext("/auth/logout", new LoginApiHandler(sessionFactory));
 
         server.setExecutor(null);
         server.start();

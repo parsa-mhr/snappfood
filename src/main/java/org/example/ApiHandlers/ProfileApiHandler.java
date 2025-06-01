@@ -17,6 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.example.ApiHandlers.SendJson.jsonError;
+import static org.example.ApiHandlers.SendJson.sendJson;
+
 public class ProfileApiHandler implements HttpHandler {
 
     private final SessionFactory sessionFactory;
@@ -110,23 +113,6 @@ public class ProfileApiHandler implements HttpHandler {
 
         sendJson(exchange, 200, new Gson().toJson(userMap));
     }
-
-    // 📦 ارسال پاسخ JSON
-    private void sendJson(HttpExchange exchange, int code, String json) {
-        try {
-            byte[] res = json.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().set("Content-Type", "application/json");
-            exchange.sendResponseHeaders(code, res.length);
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(res);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // 📦 ساخت ارور JSON
-    private String jsonError(String msg) {
-        return new Gson().toJson(Map.of("error", msg));
-    }
 }
+
+

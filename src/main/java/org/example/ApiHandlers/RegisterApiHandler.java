@@ -18,6 +18,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.example.Security.jwtSecurity;
 
+import static org.example.ApiHandlers.SendJson.jsonError;
+import static org.example.ApiHandlers.SendJson.sendJson;
+
 public class RegisterApiHandler implements HttpHandler {
 
     private final SessionFactory sessionFactory;
@@ -113,7 +116,7 @@ public class RegisterApiHandler implements HttpHandler {
 
         } catch (InvalidFieldException e) {
             sendJson(exchange, 400, jsonError(e.getMessage()));
-        }catch (AlredyExistException e){
+        } catch (AlredyExistException e) {
             sendJson(exchange, 409, jsonError(e.getMessage()));
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -122,22 +125,5 @@ public class RegisterApiHandler implements HttpHandler {
             e.printStackTrace();
             sendJson(exchange, 500, jsonError("Internal Server Error"));
         }
-    }
-
-    private void sendJson(HttpExchange exchange, int code, String json) {
-        try {
-            byte[] res = json.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().set("Content-Type", "application/json");
-            exchange.sendResponseHeaders(code, res.length);
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(res);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String jsonError(String msg) {
-        return new Gson().toJson(Map.of("error", msg));
     }
 }

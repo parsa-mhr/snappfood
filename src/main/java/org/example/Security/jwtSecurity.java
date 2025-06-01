@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import java.util.Date;
+import java.util.UUID;
 
 public class jwtSecurity {
     private static final String SECRET = "my-secret-key"; // حتماً قوی و امن باشه
@@ -15,6 +16,7 @@ public class jwtSecurity {
                 .withClaim("userId", userId)
                 .withClaim("role", role)
                 .withIssuer("food-app")
+                .withJWTId(UUID.randomUUID().toString())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC256(SECRET));
     }
@@ -33,4 +35,13 @@ public class jwtSecurity {
     public static String getRole(String token) {
         return verifyToken(token).getClaim("role").asString();
     }
+
+    public static String getJti(String token) {
+        return verifyToken(token).getId(); // jti
+    }
+
+    public static Date getExpiration(String token) {
+        return verifyToken(token).getExpiresAt();
+    }
+
 }

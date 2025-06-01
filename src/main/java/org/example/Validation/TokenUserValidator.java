@@ -2,6 +2,8 @@ package org.example.Validation;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import org.example.ApiHandlers.SendJson;
+import org.example.Security.TokenBlacklist;
 import org.example.Security.jwtSecurity;
 import org.example.Unauthorized.UnauthorizedException;
 import org.example.User.User;
@@ -23,7 +25,10 @@ public class TokenUserValidator {
 
         String token = authHeader.substring(7);
         Long userId;
-
+        String jti = jwtSecurity.getJti(token);
+        if (TokenBlacklist.isBlacklisted(jti)) {
+            throw new RuntimeException("Token is blacklisted. Please log in again.");
+        }
         try {
             userId = jwtSecurity.getUserId(token); // این متد JWT رو verify می‌کنه
         } catch (TokenExpiredException e) {
