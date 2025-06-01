@@ -3,14 +3,17 @@ package org.example.ApiHandlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.example.Security.PasswordUtil;
+import org.example.User.Courier;
 import org.example.User.User;
-import org.example.User.UserRole;
-import org.hibernate.Session;
+import org.example.Validation.ExistUser;
+import org.example.Security.jwtSecurity;
+import org.example.Unauthorized.UnauthorizedException;
 import org.hibernate.SessionFactory;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LoginApiHandler implements HttpHandler {
@@ -25,13 +28,13 @@ public class LoginApiHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         try {
             if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {
-                sendJson(exchange, 405, "Method Not Allowed");
+                sendJson(exchange, 405, jsonError("Method Not Allowed"));
                 return;
             }
 
             String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
             if (contentType == null || !contentType.contains("application/json")) {
-                sendJson(exchange, 400, "Content-Type must be application");
+                sendJson(exchange, 400, jsonError("Content-Type must be application/json"));
                 return;
             }
 
@@ -42,33 +45,41 @@ public class LoginApiHandler implements HttpHandler {
             String phone = body.get("phone");
             String password = body.get("password");
 
-            if (phone == null || password == null) {
-                sendJson(exchange, 400, "Phone and password are required");
-                return;
+            // استفاده از کلاس ExistUser برای بررسی کاربر
+            ExistUser checker = new ExistUser(sessionFactory);
+            User user = checker.validate(phone, password);
+
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("id", String.valueOf(user.getId()));
+            userMap.put("full_name", user.getFullName());
+            userMap.put("phone", user.getPhonenumber());
+            userMap.put("email", user.getEmail());
+            userMap.put("role", user.getRole().name());
+            userMap.put("address", user.getadress());
+            userMap.put("profileImageBase64", user.getProfileImageBase64());
+
+            if (user instanceof Courier courier && courier.getBankInformation() != null) {
+                Map<String, String> bankMap = new HashMap<>();
+                bankMap.put("bank_name", courier.getBankInformation().getBankName());
+                bankMap.put("account_number", courier.getBankInformation().getAccountNumber());
+                userMap.put("bank_info", bankMap);
             }
 
-            Session session = sessionFactory.openSession();
-            User user = session.createQuery("FROM User WHERE phonenumber = :phone", User.class)
-                    .setParameter("phone", phone)
-                    .uniqueResult();
-            session.close();
+            String token = jwtSecurity.generateToken(user.getId(), user.getRole().name());
+            Long userId = user.getId(); // ⬅️ فقط بعد از save استفاده کن
 
-            if (user == null || !PasswordUtil.checkPassword(password, user.getPassword())) {
-                sendJson(exchange, 401, "Invalid phone or password");
-                return;
-            }
-
-            String json = gson.toJson(Map.of(
-                    "message", "Login successful",
-                    "userId", String.valueOf(user.getId()),
-                    "role", user.getRole().name(),
-                    "token", "fake-jwt-token"
-            ));
+            Map<String, Object> responseMap = new LinkedHashMap<>();
+            responseMap.put("message", "Login successful");
+            responseMap.put("token", token);
+            responseMap.put("user", userMap);
+            String json = gson.toJson(responseMap);
             sendJson(exchange, 200, json);
 
+        } catch (UnauthorizedException e) {
+            sendJson(exchange, 401, jsonError(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
-            sendJson(exchange, 500, "Internal Server Error");
+            sendJson(exchange, 500, jsonError("Internal Server Error"));
         }
     }
 
@@ -83,5 +94,9 @@ public class LoginApiHandler implements HttpHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String jsonError(String msg) {
+        return new Gson().toJson(Map.of("error", msg));
     }
 }

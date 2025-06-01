@@ -9,7 +9,7 @@ import org.example.Security.PasswordUtil;
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     protected String fullName;
@@ -40,14 +40,7 @@ public abstract class User {
     public User(String fullName, String email, String password, String phonenumber, String adress) {
         this.fullName = fullName;
         this.email = email;
-        this.password = PasswordUtil.hashPassword(password);
-        this.phonenumber = phonenumber;
-        this.adress = adress;
-    }
-    public User(String fullName, String password, String phonenumber, String adress) {
-        this.fullName = fullName;
-        this.email = null;
-        this.password = PasswordUtil.hashPassword(password);
+        this.password = password;
         this.phonenumber = phonenumber;
         this.adress = adress;
     }
@@ -55,7 +48,7 @@ public abstract class User {
     public User() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
