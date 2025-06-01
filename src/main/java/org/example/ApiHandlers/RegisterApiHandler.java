@@ -36,7 +36,7 @@ public class RegisterApiHandler implements HttpHandler {
 
             String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
             if (contentType == null || !contentType.contains("application/json")) {
-                sendJson(exchange, 400, jsonError("Content-Type must be application/json"));
+                sendJson(exchange, 415, jsonError("Unsupported media type"));
                 return;
             }
 
@@ -111,8 +111,10 @@ public class RegisterApiHandler implements HttpHandler {
             // پاسخ موفق
             sendJson(exchange, 200, json);
 
-        } catch (InvalidFieldException | AlredyExistException e) {
+        } catch (InvalidFieldException e) {
             sendJson(exchange, 400, jsonError(e.getMessage()));
+        }catch (AlredyExistException e){
+            sendJson(exchange, 409, jsonError(e.getMessage()));
         } catch (RuntimeException e) {
             e.printStackTrace();
             sendJson(exchange, 500, jsonError("Database error: " + e.getMessage()));
