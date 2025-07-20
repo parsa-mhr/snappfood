@@ -1,19 +1,24 @@
 package org.example.Restaurant;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
+/**
+ * کلاس MenuItem برای مدل‌سازی آیتم‌های منوی رستوران
+ * این کلاس با schema food_item در مشخصات OpenAPI همخوانی دارد
+ */
 @Entity
 @Table(name = "menu_items")
 public class MenuItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private String name;
 
     @Lob
     @Column(name = "image", columnDefinition = "LONGBLOB")
@@ -22,114 +27,66 @@ public class MenuItem {
     @Transient
     private String imageBase64;
 
-    @Column(length = 1000)
+    @Column(nullable = false, length = 1000)
     private String description;
 
     @Column(nullable = false)
     private int price;
 
     @Column(nullable = false)
-    private int inventory;
+    private int supply;
 
-    @Column(nullable = false)
-    private String category;
-
-//    @ElementCollection
-//    private List<String> keywords = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "menu_item_keywords", joinColumns = @JoinColumn(name = "menu_item_id"))
+    @Column(name = "keyword", nullable = false)
+    private List<String> keywords;
 
     @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     public MenuItem() {
     }
 
-    public MenuItem(String title, String description, int price, int inventory, String category/* , List<String> keywords*/,
-            Restaurant restaurant) {
-        this.title = title;
+    public MenuItem(String name, String description, int price, int supply, List<String> keywords, Restaurant restaurant) {
+        this.name = name;
         this.description = description;
         this.price = price;
-        this.inventory = inventory;
-        this.category = category;
-       // this.keywords = keywords;
+        this.supply = supply;
+        this.keywords = keywords;
         this.restaurant = restaurant;
     }
 
-    // ====== Getters and Setters ======
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public byte[] getImage() {
-        return image;
-    }
-
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public byte[] getImage() { return image; }
     public void setImage(byte[] image) {
         this.image = image;
+        this.imageBase64 = (image != null) ? Base64.getEncoder().encodeToString(image) : null;
     }
-
-    public String getImageBase64() {
-        return imageBase64;
-    }
-
+    public String getImageBase64() { return imageBase64; }
     public void setImageBase64(String imageBase64) {
         this.imageBase64 = imageBase64;
+        if (imageBase64 != null && !imageBase64.isEmpty()) {
+            try {
+                this.image = Base64.getDecoder().decode(imageBase64);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("فرمت imageBase64 نامعتبر است");
+            }
+        } else {
+            this.image = null;
+        }
     }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public int getInventory() {
-        return inventory;
-    }
-
-    public void setInventory(int inventory) {
-        this.inventory = inventory;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-//    public List<String> getKeywords() {
-//        return keywords;
-//    }
-
-//    public void setKeywords(List<String> keywords) {
-//        this.keywords = keywords;
-//    }
-
-    public Restaurant getRestaurant() {
-        return restaurant;
-    }
-
-    public void setRestaurant(Restaurant restaurant) {
-        this.restaurant = restaurant;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public int getPrice() { return price; }
+    public void setPrice(int price) { this.price = price; }
+    public int getSupply() { return supply; }
+    public void setSupply(int supply) { this.supply = supply; }
+    public List<String> getKeywords() { return keywords; }
+    public void setKeywords(List<String> keywords) { this.keywords = keywords; }
+    public Restaurant getRestaurant() { return restaurant; }
+    public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 }

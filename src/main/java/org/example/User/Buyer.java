@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@PrimaryKeyJoinColumn (name = "id")
 @Table(name = "Buyers")
 public class Buyer extends User {
     // the buyer can add anything to cart
