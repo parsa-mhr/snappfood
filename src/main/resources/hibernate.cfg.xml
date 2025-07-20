@@ -38,6 +38,8 @@
         <mapping class = "org.example.Models.Coupon"/>
         <mapping class = "org.example.Models.Favorite"/>
         <mapping class = "org.example.Models.Rating"/>
+        <mapping class="org.example.Details.CartItem"/>
+
 
 
         <!-- یا -->

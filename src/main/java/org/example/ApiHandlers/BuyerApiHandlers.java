@@ -262,14 +262,12 @@ public class BuyerApiHandlers {
                 }
                 int restaurantId = Integer.parseInt(parts[3]);
 
-                // 3. پیدا کردن رستوران از DB (فرض: restaurantService.exists(id) یا getById(id))
                 Restaurant restaurant = restaurantService.getById(restaurantId).get();
                 if (restaurant == null) {
                     sendError(exchange, 404, "Restaurant not found");
                     return;
                 }
 
-                // 4. ایجاد و ذخیره favorite
                 Favorite fav = new Favorite();
                 fav.setBuyerId(buyerId);
                 fav.setRestaurant(restaurant);
@@ -336,26 +334,72 @@ public class BuyerApiHandlers {
     public static class RatingDetailHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
-            try {
-                int id = parseId(exchange);
-                Optional<Rating> opt = ratingService.getById(id);
-                if (opt.isEmpty()) { sendError(exchange,404,"Not found"); return; }
-                sendJson(exchange,200,opt.get());
-            } catch (Exception e) {
-                sendError(exchange,400,"Invalid ID");
+            if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                try {
+                    int id = parseId(exchange);
+                    Optional<Rating> opt = ratingService.getById(id);
+                    if (opt.isEmpty()) {
+                        sendError(exchange, 404, "Not found");
+                        return;
+                    }
+                    sendJson(exchange, 200, opt.get());
+                } catch (Exception e) {
+                    sendError(exchange, 400, "Invalid ID");
+                }
             }
+
+            //DELETE /ratings/{id}
+
+          else  if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
+
+                boolean success = false;
+                try {
+                    int id = parseId(exchange);
+                    success = ratingService.removeRating(id);
+                } catch (Exception e) {
+                    sendError(exchange, 400, "Invalid ID");
+                }
+                if (success) sendJson(exchange, 200, success);
+                else HttpUtils.sendJson(exchange, 401, "Resource not found");
+            }
+
+            //PUT /ratings/{id}
+
+           else if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+
+                Rating body = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), Rating.class);
+                try {
+                    int id = parseId(exchange);
+                    Rating rating = ratingService.updateRating(body.getScore(), body.getComment(), body.getImageBase64(), id);
+                    HttpUtils.sendJson(exchange, 200, String.valueOf(rating));
+                } catch (Exception e) {
+                    sendError(exchange, 400, "Invalid ID");
+                }
+
+            }else
+                sendError(exchange , 405 , "invalid req");
         }
     }
 
-    // Helpers
-    private static void sendJson(HttpExchange ex, int code, Object obj) throws IOException {
-        String j = gson.toJson(obj);
-        byte[] b = j.getBytes(StandardCharsets.UTF_8);
-        ex.getResponseHeaders().add("Content-Type","application/json; charset=utf-8");
-        ex.sendResponseHeaders(code,b.length);
-        try(OutputStream os=ex.getResponseBody()){os.write(b);}    }
-    private static void sendError(HttpExchange ex, int code, String msg) throws IOException { sendJson(ex,code,new ErrorResponse(code,msg)); }
-    private static void sendEmpty(HttpExchange ex, int code) throws IOException { ex.sendResponseHeaders(code,-1); }
-    private static int parseId(HttpExchange ex){ String[] p=ex.getRequestURI().getPath().split("/"); return Integer.parseInt(p[p.length-1]); }
-}
+            // Helpers
+            private static void sendJson (HttpExchange ex,int code, Object obj) throws IOException {
+                String j = gson.toJson(obj);
+                byte[] b = j.getBytes(StandardCharsets.UTF_8);
+                ex.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
+                ex.sendResponseHeaders(code, b.length);
+                try (OutputStream os = ex.getResponseBody()) {
+                    os.write(b);
+                }
+            }
+            private static void sendError (HttpExchange ex,int code, String msg) throws IOException {
+                sendJson(ex, code, new ErrorResponse(code, msg));
+            }
+            private static void sendEmpty (HttpExchange ex,int code) throws IOException {
+                ex.sendResponseHeaders(code, -1);
+            }
+            private static int parseId (HttpExchange ex){
+                String[] p = ex.getRequestURI().getPath().split("/");
+                return Integer.parseInt(p[p.length - 1]);
+            }
+        }
+

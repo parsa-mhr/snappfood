@@ -30,4 +30,29 @@ public class RatingService {
             s.beginTransaction(); s.save(rating); s.getTransaction().commit(); return rating;
         }
     }
+    public boolean removeRating(int Id) {
+        try (Session s = factory.openSession()) {
+            s.beginTransaction();
+            Query<?> q = s.createQuery("DELETE Rating r WHERE r.id = :id ");
+            q.setParameter("id", Id);
+            int count = q.executeUpdate();
+            s.getTransaction().commit();
+            return count>0 ;
+
+        }
+    }
+    public Rating updateRating(int rating , String comment , String imageBase64 , int id) {
+        Rating x = getById(id).get() ;
+        if (x != null) {
+            x.setComment (comment );
+            x.setScore(rating);
+            x.setImageBase64 (imageBase64);
+        }
+
+        try (Session s = factory.openSession()) {
+            s.update(x);
+            s.getTransaction().commit();
+            return x;
+        }
+    }
 }
