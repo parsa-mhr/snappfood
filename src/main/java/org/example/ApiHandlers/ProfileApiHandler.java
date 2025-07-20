@@ -34,9 +34,15 @@ public class ProfileApiHandler implements HttpHandler {
             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
             // اعتبارسنجی توکن
-            TokenUserValidator validator = new TokenUserValidator(sessionFactory);
-            User user = validator.validate(authHeader);
+            User user = null;
+            try {
+                TokenUserValidator validator = new TokenUserValidator(sessionFactory);
+                user = validator.validate(authHeader);
 
+            } catch (Exception e) {
+                sendJson(exchange, 401, e.getMessage());
+            }
+            if (user != null) {
             // هدایت به متد مربوطه
             if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
                 handleGetProfile(exchange, user);
@@ -45,14 +51,16 @@ public class ProfileApiHandler implements HttpHandler {
             } else {
                 sendJson(exchange, 405, jsonError("Method Not Allowed"));
             }
-
-        } catch (UnauthorizedException e) {
-            sendJson(exchange, 401, jsonError(e.getMessage()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            sendJson(exchange, 500, jsonError("Internal Server Error"));
         }
-    }
+
+            } catch(UnauthorizedException e){
+                sendJson(exchange, 401, jsonError(e.getMessage()));
+            } catch(Exception e){
+                e.printStackTrace();
+                sendJson(exchange, 500, jsonError("Internal Server Error"));
+            }
+        }
+
 
     // 📥 متد برای به‌روزرسانی پروفایل
     private void handleUpdateProfile(HttpExchange exchange, User user) {

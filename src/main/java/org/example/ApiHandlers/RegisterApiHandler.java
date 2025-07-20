@@ -48,7 +48,7 @@ public class RegisterApiHandler implements HttpHandler {
                     new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8), Map.class);
 
             // استخراج داده‌ها
-            String fullName = (String) body.get("fullName");
+            String fullName = (String) body.get("full_name");
             String email = (String) body.get("email");
             String password = (String) body.get("password");
             String phone = (String) body.get("phone");

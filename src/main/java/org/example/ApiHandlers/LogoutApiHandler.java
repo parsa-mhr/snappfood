@@ -25,9 +25,6 @@ import static org.example.ApiHandlers.SendJson.sendJson;
 
 public class LogoutApiHandler implements HttpHandler {
 
-    public LogoutApiHandler() {
-    }
-
     @Override
     public void handle(HttpExchange exchange) {
         if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {

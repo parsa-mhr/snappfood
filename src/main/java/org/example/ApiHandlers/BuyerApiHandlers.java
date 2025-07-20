@@ -7,10 +7,14 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Details.Cart;
 import org.example.Models.*;
+import org.example.Security.jwtSecurity;
 import org.example.Services.*;
 import org.example.Restaurant.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.User.Buyer;
+import org.example.Validation.TokenUserValidator;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,6 +36,8 @@ public class BuyerApiHandlers {
     private static final CouponService couponService = new CouponService();
     private static final FavoriteService favoriteService = new FavoriteService();
     private static final RatingService ratingService = new RatingService();
+    private static final jwtSecurity jwtSecurity = new jwtSecurity();
+    private static SessionFactory sessionFactory;
 
     // POST /vendors
     public static class VendorSearchHandler implements HttpHandler {
@@ -170,7 +176,10 @@ public class BuyerApiHandlers {
                 CreateOrderReq request = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), CreateOrderReq.class);
 
                 // فرض: خریدار (Buyer) از سشن یا توکن خوانده می‌شود:
-                Buyer buyer = null ; // extract from jwt;
+                String token = exchange.getRequestHeaders().getFirst("Authorization");
+                TokenUserValidator tokenvalidate = new TokenUserValidator(sessionFactory) ;
+
+                Buyer buyer = (Buyer) tokenvalidate.validate(token); // extract from jwt;
                 OrderResponseDto cart = orderService.createOrder(request, buyer);
 
                 sendJson(exchange, 201, cart);
@@ -214,9 +223,9 @@ public class BuyerApiHandlers {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
             try {
                 //extract from jwt
-                int buyerId = Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
+                long id = org.example.Security.jwtSecurity.getUserId(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""));
                 HistoryBody body = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), HistoryBody.class);
-                List<Cart> hist = orderService.getHistory(buyerId);
+                List<Cart> hist = orderService.getHistory((int) id);
                 sendJson(exchange,200,hist);
             } catch (Exception e) {
                 sendError(exchange,400,"Invalid query");
@@ -231,8 +240,8 @@ public class BuyerApiHandlers {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
             try {
                 // extract from jwt
-                int buyerId = Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
-                List<Favorite> list = favoriteService.listFavorites(buyerId);
+                long id = org.example.Security.jwtSecurity.getUserId(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""));
+                List<Favorite> list = favoriteService.listFavorites((int) id);
                 sendJson(exchange,200,list);
             } catch (Exception e) {
                 sendError(exchange,400,"Invalid query");

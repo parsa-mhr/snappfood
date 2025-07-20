@@ -1,10 +1,7 @@
 package org.example;
 
+import org.example.ApiHandlers.*;
 import org.example.ApiHandlers.BuyerApiHandlers;
-import org.example.ApiHandlers.BuyerApiHandlers;
-import org.example.ApiHandlers.LoginApiHandler;
-import org.example.ApiHandlers.ProfileApiHandler;
-import org.example.ApiHandlers.RegisterApiHandler;
 import org.example.Details.Cart;
 import org.example.Details.OrderStatus;
 import org.example.Security.PasswordUtil;
@@ -146,7 +143,7 @@ public class Main {
         server.createContext("/ratings/", new BuyerApiHandlers.RatingDetailHandler());
 
         server.createContext("/auth/profile", new ProfileApiHandler(sessionFactory));
-        server.createContext("/auth/logout", new LoginApiHandler(sessionFactory));
+        server.createContext("/auth/logout", new LogoutApiHandler());
 
         server.setExecutor(null);
         server.start();
