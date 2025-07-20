@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.ApiHandlers.BuyerApiHandlers;
 import org.example.ApiHandlers.LoginApiHandler;
 import org.example.ApiHandlers.RegisterApiHandler;
 import org.example.Details.Cart;
@@ -12,7 +13,7 @@ import org.hibernate.*;
 import org.hibernate.cfg.*;
 import org.example.ServerHandlers.*;
 import org.example.User.*;
-
+import org.example.ApiHandlers.BuyerApiHandlers;
 import java.awt.*;
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -128,9 +129,22 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/auth/register", new RegisterApiHandler(sessionFactory));
         server.createContext("/auth/login", new LoginApiHandler(sessionFactory));
+        server.createContext("/vendors", new BuyerApiHandlers.VendorSearchHandler());
+        server.createContext("/vendors/", new BuyerApiHandlers.VendorDetailHandler());       // توجه: با slash
+        server.createContext("/items", new BuyerApiHandlers.ItemsListHandler());
+        server.createContext("/items/", new BuyerApiHandlers.ItemDetailHandler());
+        server.createContext("/coupons", new BuyerApiHandlers.CouponsListHandler());
+        server.createContext("/orders", new BuyerApiHandlers.OrdersCreateHandler());        // POST
+        server.createContext("/orders/", new BuyerApiHandlers.OrderDetailHandler());       // GET
+        server.createContext("/orders/history", new BuyerApiHandlers.OrderHistoryHandler());
+        server.createContext("/favorites", new BuyerApiHandlers.FavoritesListHandler());
+        server.createContext("/ratings", new BuyerApiHandlers.RatingsListHandler());
+        server.createContext("/ratings/items/", new BuyerApiHandlers.RatingsByItemHandler());
+        server.createContext("/ratings/", new BuyerApiHandlers.RatingDetailHandler());
+
 
         server.setExecutor(null);
         server.start();
-        System.err.println("Server Started on port " + port + "...!");
+        System.out.println("Server Started on port " + port + "...!");
     }
 }

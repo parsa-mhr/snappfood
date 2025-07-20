@@ -44,6 +44,13 @@ public abstract class Restaurant {
     @Transient
     private Menu menu;
 
+    private double tax_fee;
+
+    private double additional_fee;
+
+    private Double rating;
+    private Double deliveryFee;
+
 //    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<MenuItem> menuItems = new ArrayList<>();
 
@@ -130,5 +137,53 @@ public void loadMenu(Session session) {
 
     public Menu getMenu() {
         return menu;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Seller getSeller() {
+        return seller;
+    }
+
+    public void setSeller(Seller seller) {
+        this.seller = seller;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+    }
+
+    public double getTax_fee() {
+        return tax_fee;
+    }
+
+    public void setTax_fee(double tax_fee) {
+        this.tax_fee = tax_fee;
+    }
+
+    public double getAdditional_fee() {
+        return additional_fee;
+    }
+
+    public void setAdditional_fee(double additional_fee) {
+        this.additional_fee = additional_fee;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public Double getDeliveryFee() {
+        return deliveryFee;
+    }
+
+    public void setDeliveryFee(Double deliveryFee) {
+        this.deliveryFee = deliveryFee;
     }
 }
