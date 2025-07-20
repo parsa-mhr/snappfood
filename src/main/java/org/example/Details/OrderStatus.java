@@ -1,9 +1,12 @@
 package org.example.Details;
 
-import jakarta.persistence.Entity;
-
-
 public enum OrderStatus {
-    Deliverd , Pending , Current_Order  // Cart sttaus
-     , ACCEPTED , RECEIVED // FOR CURRENT ORDER
+    SUBMITTED,
+    UNPAID_AND_CANCELLED,
+    WAITING_VENDOR,
+    CANCELLED,
+    FINDING_COURIER,
+    ON_THE_WAY,
+    COMPLETED,
+    ACCEPTED
 }

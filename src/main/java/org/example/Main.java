@@ -1,11 +1,24 @@
 package org.example;
 
+import org.example.ApiHandlers.DeleteItemApiHandler;
 import org.example.ApiHandlers.LoginApiHandler;
 import org.example.ApiHandlers.LogoutApiHandler;
+import org.example.ApiHandlers.MineApiHandler;
 import org.example.ApiHandlers.ProfileApiHandler;
 import org.example.ApiHandlers.RegisterApiHandler;
+import org.example.ApiHandlers.RestaurantDispatcher;
+import org.example.ApiHandlers.RestaurantMenuAddItemApiHandler;
+import org.example.ApiHandlers.RestaurantMenuApiHandler;
+import org.example.ApiHandlers.RestaurantMenuDeleteApiHandler;
+import org.example.ApiHandlers.RestaurantMenuItemDeleteApiHandler;
+import org.example.ApiHandlers.RestaurantOrderStatusUpdateApiHandler;
+import org.example.ApiHandlers.RestaurantOrdersApiHandler;
+import org.example.ApiHandlers.RestaurantsItemApiHandler;
+import org.example.ApiHandlers.RestaurantsApiHandler;
+import org.example.ApiHandlers.RestaurantsUpdateApiHandler;
+import org.example.ApiHandlers.RestaurantsUpdateApiHandler;
+import org.example.ApiHandlers.RestaurantsUpdateItemApiHandler;
 import org.example.Details.Cart;
-import org.example.Details.OrderStatus;
 import org.example.Restaurant.MenuItem;
 import org.example.Restaurant.Restaurant;
 import org.example.Security.PasswordUtil;
@@ -65,6 +78,7 @@ public class Main {
         server.createContext("/auth/login", new LoginApiHandler(sessionFactory));
         server.createContext("/auth/profile", new ProfileApiHandler(sessionFactory));
         server.createContext("/auth/logout", new LogoutApiHandler());
+        server.createContext("/restaurants", new RestaurantDispatcher(sessionFactory));
 
         server.setExecutor(null);
         server.start();

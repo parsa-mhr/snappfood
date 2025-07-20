@@ -9,7 +9,7 @@ import org.example.Security.PasswordUtil;
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Userid")
+    @Column(name = "id")
     private Long id;
 
     @Column(nullable = false)

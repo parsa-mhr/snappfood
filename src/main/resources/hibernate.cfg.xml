@@ -35,6 +35,7 @@
         <mapping class = "org.example.Details.Cart"/>
         <mapping class = "org.example.Restaurant.MenuItem"/>
         <mapping class = "org.example.Restaurant.Restaurant"/>
+        <mapping class = "org.example.Restaurant.MenuCategory"/>
 
         <!-- یا -->
         <!-- <mapping resource="yourEntity.hbm.xml"/> -->
