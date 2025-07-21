@@ -77,7 +77,7 @@ public class OrderService {
                     Cart.class
             );
             q.setParameter("bid", buyerId);
-            q.setParameter("statuses", Arrays.asList(OrderStatus.Deliverd, OrderStatus.Current_Order));
+            q.setParameter("statuses", Arrays.asList(OrderStatus.COMPLETED, OrderStatus.ACCEPTED , OrderStatus.FINDING_COURIER , OrderStatus.ON_THE_WAY , OrderStatus.WAITING_VENDOR));
 
             return q.list();
         }
@@ -107,7 +107,7 @@ public class OrderService {
 
                 Query<Cart> q = s.createQuery(hql, Cart.class);
                 q.setParameter("bid", buyerId);
-                q.setParameter("statuses", Arrays.asList(OrderStatus.Deliverd, OrderStatus.Current_Order));
+                q.setParameter("statuses",  Arrays.asList(OrderStatus.COMPLETED, OrderStatus.ACCEPTED , OrderStatus.FINDING_COURIER , OrderStatus.ON_THE_WAY , OrderStatus.WAITING_VENDOR));
                 q.setParameter("searchText", body.getSearch()); // ممکنه null باشه
                 q.setParameter("restaurantName", body.getVendor()); // ممکنه null باشه
 

@@ -1,15 +1,19 @@
 package org.example.ApiHandlers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Restaurant.Restaurant;
+import org.example.User.Seller;
 import org.example.User.User;
 import org.example.User.UserRole;
 import org.example.Validation.TokenUserValidator;
 import org.example.Unauthorized.UnauthorizedException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import static org.example.ApiHandlers.SendJson.jsonError;
@@ -29,7 +33,10 @@ public class MineApiHandler implements HttpHandler {
      */
     public MineApiHandler(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        this.gson = new Gson();
+         gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+
     }
 
     /**
@@ -118,6 +125,7 @@ public class MineApiHandler implements HttpHandler {
                 }
 
                 // تبدیل لیست رستوران‌ها به JSON و ارسال پاسخ
+                System.out.println(restaurants);
                 String jsonResponse = gson.toJson(restaurants);
                 sendJson(exchange, 200, jsonResponse);
             } catch (Exception e) {

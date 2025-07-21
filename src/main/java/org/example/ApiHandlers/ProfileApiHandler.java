@@ -31,7 +31,7 @@ public class ProfileApiHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) {
         try {
-            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer ", "");
 
             // اعتبارسنجی توکن
             User user = null;

@@ -8,5 +8,6 @@ public enum OrderStatus {
     FINDING_COURIER,
     ON_THE_WAY,
     COMPLETED,
-    ACCEPTED
+    ACCEPTED ,
+    Pending
 }

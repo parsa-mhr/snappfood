@@ -1,5 +1,6 @@
 package org.example.Restaurant;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.*;
 import org.example.User.Seller;
 import org.hibernate.Session;
@@ -18,21 +19,27 @@ public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Expose
     private Long id; // شناسه یکتا برای رستوران
 
     @Column(nullable = false)
+    @Expose
     private String name; // نام رستوران (اجباری)
 
     @Column(nullable = false)
+    @Expose
     private String address; // آدرس رستوران (اجباری)
 
     @Column(unique = true, nullable = false)
+    @Expose
     private String phone; // شماره تلفن رستوران (اجباری و یکتا)
 
     @Column(name = "tax_fee", nullable = false)
+    @Expose
     private Integer tax_fee; // هزینه مالیات رستوران (اجباری)
 
     @Column(name = "additional_fee", nullable = false)
+    @Expose
     private Integer additional_fee; // هزینه اضافی رستوران (اجباری)
 
     @ElementCollection
@@ -45,11 +52,19 @@ public class Restaurant {
 
     @Lob
     @Column(name = "logo", columnDefinition = "LONGBLOB")
+    @Expose
     private byte[] logo; // لوگوی رستوران به‌صورت باینری
 
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
+    @com.google.gson.annotations.Expose(serialize = false, deserialize = false)
     private Seller seller; // فروشنده مرتبط با رستوران
+
+    // فیلد کمکی برای JSON، فقط مقدار sellerId را برمی‌گرداند
+    @Transient
+    @com.google.gson.annotations.SerializedName("sellerId")
+    @com.google.gson.annotations.Expose
+    private Long sellerId;
 
     @Transient
     private String logoBase64; // لوگوی رستوران به‌صورت رشته Base64 برای پاسخ‌های API
@@ -57,21 +72,17 @@ public class Restaurant {
     @Transient
     private Menu menu; // منوی رستوران که به‌صورت پویا بارگذاری می‌شود
 
-    /**
-     * سازنده پیش‌فرض
-     */
+    // مقداردهی sellerId پس از بارگذاری از دیتابیس
+    @PostLoad
+    public void fillSellerId() {
+        this.sellerId = (seller != null) ? seller.getId() : null;
+    }
+
+    // سازنده پیش‌فرض
     public Restaurant() {
     }
 
-    /**
-     * سازنده با پارامترهای اصلی
-     * @param name نام رستوران
-     * @param address آدرس رستوران
-     * @param phone شماره تلفن رستوران
-     * @param tax_fee هزینه مالیات
-     * @param additional_fee هزینه اضافی
-     * @param seller فروشنده مالک رستوران
-     */
+    // سازنده با پارامترهای اصلی
     public Restaurant(String name, String address, String phone, Integer tax_fee, Integer additional_fee, Seller seller) {
         this.name = name;
         this.address = address;
@@ -81,188 +92,104 @@ public class Restaurant {
         this.seller = seller;
     }
 
-    /**
-     * دریافت شناسه رستوران
-     * @return شناسه رستوران
-     */
+    // getter و setterها
+
     public Long getId() {
         return id;
     }
 
-    /**
-     * تنظیم نام رستوران
-     * @param name نام جدید
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * دریافت نام رستوران
-     * @return نام رستوران
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * تنظیم آدرس رستوران
-     * @param address آدرس جدید
-     */
     public void setAddress(String address) {
         this.address = address;
     }
 
-    /**
-     * دریافت آدرس رستوران
-     * @return آدرس رستوران
-     */
     public String getAddress() {
         return address;
     }
 
-    /**
-     * تنظیم شماره تلفن رستوران
-     * @param phone شماره تلفن جدید
-     */
     public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    /**
-     * دریافت شماره تلفن رستوران
-     * @return شماره تلفن رستوران
-     */
     public String getPhone() {
         return phone;
     }
 
-    /**
-     * تنظیم هزینه مالیات
-     * @param tax_fee هزینه مالیات جدید
-     */
     public void setTaxFee(Integer tax_fee) {
         this.tax_fee = tax_fee;
     }
 
-    /**
-     * دریافت هزینه مالیات
-     * @return هزینه مالیات
-     */
     public Integer getTaxFee() {
         return tax_fee;
     }
 
-    /**
-     * تنظیم هزینه اضافی
-     * @param additional_fee هزینه اضافی جدید
-     */
     public void setAdditionalFee(Integer additional_fee) {
         this.additional_fee = additional_fee;
     }
 
-    /**
-     * دریافت هزینه اضافی
-     * @return هزینه اضافی
-     */
     public Integer getAdditionalFee() {
         return additional_fee;
     }
 
-    /**
-     * تنظیم ساعات کاری
-     * @param workingHours لیست ساعات کاری
-     */
     public void setWorkingHours(List<String> workingHours) {
         this.workingHours = workingHours;
     }
 
-    /**
-     * دریافت ساعات کاری
-     * @return لیست ساعات کاری
-     */
     public List<String> getWorkingHours() {
         return workingHours;
     }
 
-    /**
-     * تنظیم دسته‌بندی‌ها
-     * @param categories لیست دسته‌بندی‌ها
-     */
     public void setCategories(List<String> categories) {
         this.categories = categories;
     }
 
-    /**
-     * دریافت دسته‌بندی‌ها
-     * @return لیست دسته‌بندی‌ها
-     */
     public List<String> getCategories() {
         return categories;
     }
 
-    /**
-     * تنظیم لوگوی رستوران
-     * @param logo لوگو به‌صورت باینری
-     */
     public void setLogo(byte[] logo) {
         this.logo = logo;
         this.logoBase64 = (logo != null) ? Base64.getEncoder().encodeToString(logo) : null;
     }
 
-    /**
-     * دریافت لوگوی رستوران
-     * @return لوگو به‌صورت باینری
-     */
     public byte[] getLogo() {
         return logo;
     }
 
-    /**
-     * تنظیم لوگوی Base64
-     * @param logoBase64 لوگو به‌صورت رشته Base64
-     */
     public void setLogoBase64(String logoBase64) {
         this.logoBase64 = logoBase64;
         this.logo = (logoBase64 != null) ? Base64.getDecoder().decode(logoBase64) : null;
     }
 
-    /**
-     * دریافت لوگوی Base64
-     * @return لوگو به‌صورت رشته Base64
-     */
     public String getLogoBase64() {
         return logoBase64;
     }
 
-    /**
-     * تنظیم فروشنده رستوران
-     * @param seller فروشنده جدید
-     */
     public void setSeller(Seller seller) {
         this.seller = seller;
     }
 
-    /**
-     * دریافت فروشنده رستوران
-     * @return فروشنده رستوران
-     */
     public Seller getSeller() {
         return seller;
     }
 
-    /**
-     * بارگذاری منوی رستوران از پایگاه داده
-     * @param session سشن Hibernate
-     */
+    // فقط برای JSON، مقدار sellerId را برمی‌گرداند
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    // بارگذاری منوی رستوران از پایگاه داده
     public void loadMenu(Session session) {
         this.menu = new Menu(this.id, session);
     }
 
-    /**
-     * دریافت منوی رستوران
-     * @return منوی رستوران
-     */
     public Menu getMenu() {
         return menu;
     }

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Details.Cart;
+import org.example.Details.CartItem;
 import org.example.Details.OrderStatus;
 import org.example.Details.OrderDTO;
 import org.example.Restaurant.MenuItem;
@@ -15,6 +16,7 @@ import org.example.Unauthorized.UnauthorizedException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -134,21 +136,21 @@ public class RestaurantOrdersApiHandler implements HttpHandler {
 
                 // تبدیل سفارشات به DTO
                 List<OrderDTO> orderList = orders.stream().map(cart -> new OrderDTO(
-                        cart.getId(),
-                        cart.getDeliveryAddress(),
-                        cart.getCustomer().getId(),
+                        cart.getCart_id(),
+                        cart.getDelivery_address(),
+                        cart.getBuyer().getId(),
                         cart.getRestaurant().getId(),
                         cart.getCoupon() != null ? cart.getCoupon().getId() : null,
-                        cart.getItems().stream().map(MenuItem::getId).collect(Collectors.toList()),
-                        cart.getRawPrice(),
-                        cart.getTaxFee(),
-                        cart.getAdditionalFee(),
-                        cart.getCourierFee(),
-                        cart.getPayPrice(),
-                        cart.getCourier() != null ? cart.getCourier().getId() : null,
+                        cart.getItems().stream().map(CartItem -> CartItem.getMenuItem().getId()).collect(Collectors.toList()),
+                        cart.getPay_price() ,
+                        cart.getRestaurant().getTaxFee(),
+                        cart.getRestaurant().getAdditionalFee(),
+                        0 ,
+                        cart.getPay_price(),
+                        cart.getCourier_Id() != null ? Long.valueOf(cart.getCourier_Id()) : null,
                         cart.getStatus() != null ? cart.getStatus().toString() : "UNKNOWN",
-                        cart.getCreatedAt(),
-                        cart.getUpdatedAt()))
+                        cart.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                        cart.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
                         .collect(Collectors.toList());
 
                 // ارسال پاسخ موفقیت‌آمیز

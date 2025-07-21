@@ -34,7 +34,7 @@ public class Cart {
     private String delivery_address;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status = OrderStatus.Pending;
+    private OrderStatus status ;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus Current_orderStatus = null ;
@@ -66,6 +66,7 @@ public class Cart {
     }
 
     public void setPay_price(long pay_price) {
+
         this.pay_price = pay_price;
     }
 

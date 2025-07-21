@@ -110,6 +110,7 @@ public class RegisterApiHandler implements HttpHandler {
             responseMap.put("user_id", user.getId());
             responseMap.put("token", token);
             String json = gson.toJson(responseMap);
+            System.out.println(user);
 
             // پاسخ موفق
             sendJson(exchange, 200, json);

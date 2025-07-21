@@ -61,7 +61,7 @@ public class BuyerApiHandlers {
 
             List<Restaurant> vendors = service.findByFilter(filter);
             List<VendorsDto> dtoList = vendors.stream()
-                    .map(r -> new VendorsDto(r.getId(), r.getName(), r.getAddress(), r.getPhone() , r.getProfileImageBase64() , r.getTax_fee() , r.getAdditional_fee()))
+                    .map(r -> new VendorsDto(r.getId(), r.getName(), r.getAddress(), r.getPhone() , r.getLogoBase64() , r.getTaxFee() , r.getAdditionalFee()))
                     .toList();
             sendJson(exchange, 200, vendors);
         }
@@ -99,15 +99,15 @@ public class BuyerApiHandlers {
                 List<MenuItemDto> list =  items.stream().map(item -> {
                     MenuItemDto dto = new MenuItemDto();
                     dto.id = item.getId();
-                    dto.name = item.getTitle();
+                    dto.name = item.getName();
                     dto.imageBase64 = (item.getImage() != null)
                             ? Base64.getEncoder().encodeToString(item.getImage())
                             : null;
                     dto.description = item.getDescription();
                     dto.vendor_id = item.getRestaurant().getId().intValue();
                     dto.price = item.getPrice();
-                    dto.supply = item.getInventory();
-                    dto.keywords = List.of(item.getCategory()); // فعلاً category رو جای keywords می‌ذاریم
+                    dto.supply = item.getSupply();
+                    dto.keywords = item.getKeywords(); // فعلاً category رو جای keywords می‌ذاریم
                     return dto;
                 }).toList();
                 sendJson(exchange,200,items);

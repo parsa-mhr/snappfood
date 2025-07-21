@@ -164,7 +164,7 @@ public class RestaurantOrderStatusUpdateApiHandler implements HttpHandler {
                 Transaction transaction = session.beginTransaction();
                 try {
                     order.setStatus(newStatus);
-                    order.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    order.setUpdatedAt(LocalDateTime.now());
                     session.update(order);
                     transaction.commit();
                 } catch (Exception e) {

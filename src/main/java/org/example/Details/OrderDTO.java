@@ -20,19 +20,19 @@ public class OrderDTO {
     private final String updatedAt;
 
     public OrderDTO(Long id, String deliveryAddress, Long customerId, Long vendorId, Long couponId,
-            List<Long> itemIds, int rawPrice, int taxFee, int additionalFee, int courierFee,
-            int payPrice, Long courierId, String status, String createdAt, String updatedAt) {
+                    List<Long> itemIds, long rawPrice, int taxFee, int additionalFee, int courierFee,
+                    long payPrice, Long courierId, String status, String createdAt, String updatedAt) {
         this.id = id;
         this.deliveryAddress = deliveryAddress;
         this.customerId = customerId;
         this.vendorId = vendorId;
         this.couponId = couponId;
         this.itemIds = itemIds;
-        this.rawPrice = rawPrice;
+        this.rawPrice = Math.toIntExact(rawPrice);
         this.taxFee = taxFee;
         this.additionalFee = additionalFee;
         this.courierFee = courierFee;
-        this.payPrice = payPrice;
+        this.payPrice = Math.toIntExact(payPrice);
         this.courierId = courierId;
         this.status = status;
         this.createdAt = createdAt;

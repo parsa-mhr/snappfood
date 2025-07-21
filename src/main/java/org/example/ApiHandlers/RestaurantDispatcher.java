@@ -44,7 +44,32 @@ public class RestaurantDispatcher implements HttpHandler {
                 } else {
                     sendJson(exchange, 405, jsonError("متد مجاز نیست"));
                 }
-            } else {
+            } else if (segments.length == 2) {
+                if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                    new RestaurantsApiHandler(sessionFactory).handle(exchange);
+                }
+            }else if (segments.length == 3 && segments[2].equals("mine")) {
+                if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                    new MineApiHandler(sessionFactory).handle(exchange);
+                }
+            }else if (segments.length == 3) {
+                if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+                    new RestaurantsUpdateApiHandler(sessionFactory).handle(exchange);
+                }
+            }else if (segments.length == 4 && segments[3].equals("item")) {
+                if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                    new RestaurantsItemApiHandler(sessionFactory).handle(exchange);
+                }
+            }else if (segments.length == 5 && segments[3].equals("item")) {
+                if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+                    new RestaurantsUpdateItemApiHandler(sessionFactory).handle(exchange);
+                }else if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                    //delete handler
+                }
+            }
+
+
+            else {
                 sendJson(exchange, 400, jsonError("مسیر نامعتبر است"));
             }
 

@@ -119,7 +119,7 @@ public class LoginApiHandler implements HttpHandler {
             sendJson(exchange, 200, gson.toJson(Map.of(
                     "message", "ورود با موفقیت انجام شد",
                     "token", token,
-                    "user_id", user.getId(),
+                    "user_id", user.getId() != null ? user.getId().toString() : "null",
                     "role", user.getRole().toString()
             )));
 
