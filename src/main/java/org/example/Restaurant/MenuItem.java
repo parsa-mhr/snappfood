@@ -1,5 +1,6 @@
 package org.example.Restaurant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Base64;
 import java.util.List;
@@ -39,6 +40,7 @@ public class MenuItem {
     @ElementCollection
     @CollectionTable(name = "menu_item_keywords", joinColumns = @JoinColumn(name = "menu_item_id"))
     @Column(name = "keyword", nullable = false)
+    @JsonIgnore
     private List<String> keywords;
 
     @ManyToOne

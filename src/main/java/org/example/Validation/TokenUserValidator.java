@@ -8,12 +8,13 @@ import org.example.Unauthorized.UnauthorizedException;
 import org.example.User.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 /**
  * کلاس TokenUserValidator برای اعتبارسنجی توکن JWT و دریافت کاربر مرتبط
  */
 public class TokenUserValidator {
-    private final SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
     private static final String SECRET = "your_jwt_secret_key"; // کلید مخفی JWT
     private static final String ISSUER = "aut_food"; // صادرکننده توکن
 
@@ -22,7 +23,6 @@ public class TokenUserValidator {
      * @param sessionFactory فکتوری برای ارتباط با پایگاه داده
      */
     public TokenUserValidator(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
     }
 
     /**

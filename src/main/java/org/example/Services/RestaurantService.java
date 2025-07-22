@@ -8,7 +8,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public class RestaurantService {
     private final SessionFactory sessionFactory;
@@ -53,9 +52,16 @@ public class RestaurantService {
     }
 
 
-    public Optional<Restaurant> getById(int id) {
+    public List<MenuItem> getById(int id) {
         try (Session session = sessionFactory.openSession()) {
-            return Optional.ofNullable(session.get(Restaurant.class, id));
+            return session.createQuery("SELECT mi FROM MenuItem mi WHERE mi.restaurant.id = :restaurantId", MenuItem.class)
+                    .setParameter("restaurantId", id)
+                    .getResultList();
+        }
+    }
+    public Restaurant getRestaurantById(int id) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(Restaurant.class, id);
         }
     }
 }

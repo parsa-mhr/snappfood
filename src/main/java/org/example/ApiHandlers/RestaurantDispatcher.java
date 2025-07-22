@@ -44,34 +44,97 @@ public class RestaurantDispatcher implements HttpHandler {
                 } else {
                     sendJson(exchange, 405, jsonError("متد مجاز نیست"));
                 }
-            } else if (segments.length == 2) {
-                if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
-                    new RestaurantsApiHandler(sessionFactory).handle(exchange);
-                }
-            }else if (segments.length == 3 && segments[2].equals("mine")) {
-                if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
-                    new MineApiHandler(sessionFactory).handle(exchange);
-                }
-            }else if (segments.length == 3) {
-                if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
-                    new RestaurantsUpdateApiHandler(sessionFactory).handle(exchange);
-                }
-            }else if (segments.length == 4 && segments[3].equals("item")) {
-                if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
-                    new RestaurantsItemApiHandler(sessionFactory).handle(exchange);
-                }
-            }else if (segments.length == 5 && segments[3].equals("item")) {
-                if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
-                    new RestaurantsUpdateItemApiHandler(sessionFactory).handle(exchange);
-                }else if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
-                    //delete handler
-                }
-            }
 
+            } else if (path.equals("/restaurants/mine")) {
+                new MineApiHandler(sessionFactory).handle(exchange);
+            } else if (segments.length >= 3 && segments[1].equals("restaurants")) {
+                Long restaurantId = Long.parseLong(segments[2]);
+                if (segments.length == 3) {
+                    // برای PUT /restaurants/{id}
+                    if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+                        new RestaurantsUpdateApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                } else if (segments.length == 4 && segments[3].equals("item")) {
+                    // برای POST /restaurants/{id}/item
+                    if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                        new RestaurantsItemApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                } else if (segments.length == 4 && segments[3].equals("menu")) {
+                    // برای POST /restaurants/{id}/menu
+                    if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                        new RestaurantMenuApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                } else if (segments.length == 4 && segments[3].equals("orders")) {
+                    // برای GET /restaurants/{id}/orders
+                    if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                        new RestaurantOrdersApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                } else if (segments.length == 5 && segments[3].equals("menu")) {
+                    // برای PUT /restaurants/{id}/menu/{title} و DELETE /restaurants/{id}/menu/{title}
+                    if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+                        new RestaurantMenuAddItemApiHandler(sessionFactory).handle(exchange);
+                    } else if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                        new RestaurantMenuDeleteApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                } else if (segments.length == 5 && segments[3].equals("item")) {
+                    // برای PUT و DELETE /restaurants/{id}/item/{item_id}
+                    if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+                        new RestaurantsUpdateItemApiHandler(sessionFactory).handle(exchange);
+                    } else if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                        new RestaurantMenuItemDeleteApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                } else if (segments.length == 6 && segments[3].equals("menu")) {
+                    // برای DELETE /restaurants/{id}/menu/{title}/{item_id}
+                    if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                        new RestaurantMenuRemoveItemApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                } else {
+                    SendJson.sendJson(exchange, 400, SendJson.jsonError("مسیر نامعتبر است"));
+                }
+            } else {
+                SendJson.sendJson(exchange, 400, SendJson.jsonError("مسیر نامعتبر است"));}
+//            } else if (segments.length == 2) {
+//                if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+//                    new RestaurantsApiHandler(sessionFactory).handle(exchange);
+//                }
+//            }else if (segments.length == 3 && segments[2].equals("mine")) {
+//                if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+//                    new MineApiHandler(sessionFactory).handle(exchange);
+//                }
+//            }else if (segments.length == 3) {
+//                if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+//                    new RestaurantsUpdateApiHandler(sessionFactory).handle(exchange);
+//                }
+//            }else if (segments.length == 4 && segments[3].equals("item")) {
+//                if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+//                    new RestaurantsItemApiHandler(sessionFactory).handle(exchange);
+//                }
+//            }else if (segments.length == 5 && segments[3].equals("item")) {
+//                if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+//                    new RestaurantsUpdateItemApiHandler(sessionFactory).handle(exchange);
+//                }else if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
+//                    //delete handler
+//                }
+            // }
 
-            else {
-                sendJson(exchange, 400, jsonError("مسیر نامعتبر است"));
-            }
+//
+//            else {
+//                sendJson(exchange, 400, jsonError("مسیر نامعتبر است"));
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();

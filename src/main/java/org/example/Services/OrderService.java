@@ -10,16 +10,14 @@ import org.example.Models.OrderResponseDto;
 import org.example.Restaurant.MenuItem;
 import org.example.Restaurant.Restaurant;
 import org.example.User.Buyer;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Order;
 import org.hibernate.query.Query;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class OrderService {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
@@ -41,7 +39,7 @@ public class OrderService {
             cart.setRestaurant(restaurant);
             cart.setCoupon(coupon);
             cart.setDelivery_address(request.delivery_address);
-            cart.setStatus(OrderStatus.Pending);
+            cart.setStatus(OrderStatus.SUBMITTED);
 
             for (CreateOrderReq.ItemRequest itemRequest : request.items) {
                 MenuItem menuItem = session.get(MenuItem.class, itemRequest.item_id);
@@ -68,8 +66,18 @@ public class OrderService {
             return toResponse(cart.get());
         }
     }
+    public Cart getCartById(int id) {
+        try (Session s = factory.openSession()) {
+            return s.createQuery(
+                            "SELECT c FROM Cart c JOIN FETCH c.items i JOIN FETCH i.menuItem WHERE c.id = :id"
+                            , Cart.class)
+                    .setParameter("id", id)
+                    .uniqueResult();
+        }
+    }
 
-    public List<Cart> getHistory(int buyerId) {
+
+    public List<OrderResponseDto> getHistory(int buyerId) {
         try (Session s = factory.openSession()) {
             // توجه کنید که اینجا o.buyer.id را با پارامتر bid مقایسه می‌کنیم
             Query<Cart> q = s.createQuery(
@@ -77,9 +85,20 @@ public class OrderService {
                     Cart.class
             );
             q.setParameter("bid", buyerId);
-            q.setParameter("statuses", Arrays.asList(OrderStatus.COMPLETED, OrderStatus.ACCEPTED , OrderStatus.FINDING_COURIER , OrderStatus.ON_THE_WAY , OrderStatus.WAITING_VENDOR));
+            q.setParameter("statuses", Arrays.asList(OrderStatus.COMPLETED, OrderStatus.ACCEPTED , OrderStatus.FINDING_COURIER , OrderStatus.ON_THE_WAY , OrderStatus.WAITING_VENDOR , OrderStatus.SUBMITTED));
 
-            return q.list();
+            List<Cart> hist = q.list();
+            for (Cart cart : hist) {
+                Hibernate.initialize(cart.getBuyer());
+                Hibernate.initialize(cart.getRestaurant());
+                Hibernate.initialize(cart.getCoupon());
+                Hibernate.initialize(cart.getItems());
+            }
+            List <OrderResponseDto> dtos = new ArrayList<>();
+            for (Cart cart : hist) {
+                dtos.add(toResponse(cart));
+            }
+            return dtos;
         }
     }
     public List<Cart> SearchHistory(HistoryBody body , String buyerId) {
@@ -124,10 +143,10 @@ public class OrderService {
             res.coupon_id = cart.getCoupon() != null ? cart.getCoupon().getId() : null;
 
             // فرض: در CartItem قیمت واحد آیتم هست
-            List<Long> itemIds = new ArrayList<>();
+            Map<Long , Integer> itemIds = new HashMap<>();
             double rawPrice = 0;
             for (CartItem item : cart.getItems()) {
-                itemIds.add(item.getMenuItem().getId());
+                itemIds.put(item.getMenuItem().getId() ,  item.getQuantity());
                 rawPrice += item.getMenuItem().getPrice() * item.getQuantity();
             }
 

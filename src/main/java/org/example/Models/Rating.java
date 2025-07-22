@@ -5,6 +5,8 @@ import org.example.Details.Cart;
 import org.example.Restaurant.MenuItem;
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 
+import java.util.List;
+
 @Entity
 @Table(name = "ratings")
 public class Rating {
@@ -12,9 +14,14 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer buyerId;
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private MenuItem item;
+
+    @ManyToMany
+    @JoinTable(
+            name = "rating_items",
+            joinColumns = @JoinColumn(name = "rating_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private List<MenuItem> items;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
@@ -28,8 +35,15 @@ public class Rating {
     public void setId(Integer id) { this.id = id; }
     public Integer getBuyerId() { return buyerId; }
     public void setBuyerId(Integer buyerId) { this.buyerId = buyerId; }
-    public MenuItem getItem() { return item; }
-    public void setItem(MenuItem item) { this.item = item; }
+
+    public List<MenuItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<MenuItem> items) {
+        this.items = items;
+    }
+
     public Integer getScore() { return rating; }
     public void setScore(Integer score) { this.rating = score; }
     public String getComment() { return comment; }

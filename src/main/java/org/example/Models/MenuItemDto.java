@@ -10,11 +10,11 @@ public class MenuItemDto {
     public int vendor_id;
     public int price;
     public int supply;
-    public List<String> keywords;
+   // public List<String> keywords;
 
     public MenuItemDto() {}
 
-    public MenuItemDto(long id, String name, String imageBase64, String description, int vendor_id, int price, int supply, List<String> keywords) {
+    public MenuItemDto(long id, String name, String imageBase64, String description, int vendor_id, int price, int supply) {
         this.id = id;
         this.name = name;
         this.imageBase64 = imageBase64;
@@ -22,7 +22,7 @@ public class MenuItemDto {
         this.vendor_id = vendor_id;
         this.price = price;
         this.supply = supply;
-        this.keywords = keywords;
+//        this.keywords = keywords;
     }
 }
 

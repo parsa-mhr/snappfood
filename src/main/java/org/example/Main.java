@@ -1,45 +1,30 @@
 package org.example;
 
 import org.example.ApiHandlers.*;
+import org.example.ApiHandlers.CourierApiHandler;
+
 import org.example.ApiHandlers.BuyerApiHandlers;
-import org.example.ApiHandlers.DeleteItemApiHandler;
 import org.example.ApiHandlers.LoginApiHandler;
 import org.example.ApiHandlers.LogoutApiHandler;
-import org.example.ApiHandlers.MineApiHandler;
 import org.example.ApiHandlers.ProfileApiHandler;
 import org.example.ApiHandlers.RegisterApiHandler;
 import org.example.ApiHandlers.RestaurantDispatcher;
-import org.example.ApiHandlers.RestaurantMenuAddItemApiHandler;
-import org.example.ApiHandlers.RestaurantMenuApiHandler;
-import org.example.ApiHandlers.RestaurantMenuDeleteApiHandler;
-import org.example.ApiHandlers.RestaurantMenuItemDeleteApiHandler;
-import org.example.ApiHandlers.RestaurantOrderStatusUpdateApiHandler;
-import org.example.ApiHandlers.RestaurantOrdersApiHandler;
-import org.example.ApiHandlers.RestaurantsItemApiHandler;
-import org.example.ApiHandlers.RestaurantsApiHandler;
-import org.example.ApiHandlers.RestaurantsUpdateApiHandler;
-import org.example.ApiHandlers.RestaurantsUpdateApiHandler;
-import org.example.ApiHandlers.RestaurantsUpdateItemApiHandler;
 import org.example.Details.Cart;
 import org.example.Restaurant.MenuItem;
 import org.example.Restaurant.Restaurant;
-import org.example.Restaurant.MenuItem;
-import org.example.Restaurant.Restaurant;
+
 import org.example.Security.PasswordUtil;
-import org.example.Restaurant.MenuItem;
-import org.example.Restaurant.Restaurant;
-import org.example.Security.PasswordUtil;//
+
 import com.sun.net.httpserver.*;
 import org.hibernate.*;
 import org.hibernate.cfg.*;
 import org.example.ServerHandlers.*;
 import org.example.User.*;
-import org.example.ApiHandlers.BuyerApiHandlers;
+
 import java.awt.*;
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -94,6 +79,7 @@ public class Main {
         server.createContext("/orders/", new BuyerApiHandlers.OrderDetailHandler());       // GET
         server.createContext("/orders/history", new BuyerApiHandlers.OrderHistoryHandler());
         server.createContext("/favorites", new BuyerApiHandlers.FavoritesListHandler());
+        server.createContext("/favorites/", new BuyerApiHandlers.FavoriteAddHandler());
         server.createContext("/ratings", new BuyerApiHandlers.RatingsListHandler());
         server.createContext("/ratings/items/", new BuyerApiHandlers.RatingsByItemHandler());
         server.createContext("/ratings/", new BuyerApiHandlers.RatingDetailHandler());
@@ -101,9 +87,14 @@ public class Main {
         server.createContext("/auth/profile", new ProfileApiHandler(sessionFactory));
         server.createContext("/auth/logout", new LogoutApiHandler());
         server.createContext("/restaurants", new RestaurantDispatcher(sessionFactory));
+        server.createContext("/deliveries/available", new CourierApiHandler.AvailableHandler());
+        server.createContext("/deliveries/history", new CourierApiHandler.HistoryHandler());
+        server.createContext("/deliveries", new CourierApiHandler.UpdateStatusHandler());
+
 
         server.setExecutor(null);
         server.start();
         System.err.println("Server Started on port " + port + "...!");
+
     }
 }

@@ -148,7 +148,7 @@ public class RestaurantMenuDeleteApiHandler implements HttpHandler {
 
                 // بررسی وابستگی‌ها (استفاده آیتم‌های دسته‌بندی در سبد خرید) با کوئری بومی
                 String checkCartSql = "SELECT COUNT(*) " +
-                                     "FROM carts c " +
+                                     "FROM cart_items c " +
                                      "WHERE c.menu_item_id IN (" +
                                      "    SELECT mim.menu_item_id " +
                                      "    FROM menu_items_mapping mim " +

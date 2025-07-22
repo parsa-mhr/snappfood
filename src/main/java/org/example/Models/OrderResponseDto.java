@@ -1,6 +1,7 @@
 package org.example.Models;
 
 import java.util.List;
+import java.util.Map;
 
 public class OrderResponseDto {
     public long id;
@@ -8,7 +9,7 @@ public class OrderResponseDto {
     public long customer_id;
     public long vendor_id;
     public Long coupon_id;
-    public List<Long> item_ids;
+    public Map<Long , Integer> item_ids;
     public double raw_price;
     public double tax_fee;
     public double additional_fee;
@@ -59,11 +60,11 @@ public class OrderResponseDto {
         this.coupon_id = coupon_id;
     }
 
-    public List<Long> getItem_ids() {
+    public Map<Long, Integer> getItem_ids() {
         return item_ids;
     }
 
-    public void setItem_ids(List<Long> item_ids) {
+    public void setItem_ids(Map<Long , Integer> item_ids) {
         this.item_ids = item_ids;
     }
 

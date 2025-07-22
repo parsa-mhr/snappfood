@@ -42,13 +42,13 @@ public class Restaurant {
     @Expose
     private Integer additional_fee; // هزینه اضافی رستوران (اجباری)
 
-    @ElementCollection
-    @Column(name = "working_hours")
-    private List<String> workingHours = new ArrayList<>(); // ساعات کاری رستوران (اختیاری)
+//    @ElementCollection
+//    @Column(name = "working_hours")
+//    private List<String> workingHours = new ArrayList<>(); // ساعات کاری رستوران (اختیاری)
 
-    @ElementCollection
-    @Column(name = "categories")
-    private List<String> categories = new ArrayList<>(); // دسته‌بندی‌های رستوران (اختیاری)
+//    @ElementCollection
+//    @Column(name = "categories")
+//    private List<String> categories = new ArrayList<>(); // دسته‌بندی‌های رستوران (اختیاری)
 
     @Lob
     @Column(name = "logo", columnDefinition = "LONGBLOB")
@@ -138,21 +138,21 @@ public class Restaurant {
         return additional_fee;
     }
 
-    public void setWorkingHours(List<String> workingHours) {
-        this.workingHours = workingHours;
-    }
+//    public void setWorkingHours(List<String> workingHours) {
+//        this.workingHours = workingHours;
+//    }
+//
+//    public List<String> getWorkingHours() {
+//        return workingHours;
+//    }
 
-    public List<String> getWorkingHours() {
-        return workingHours;
-    }
-
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
-    }
-
-    public List<String> getCategories() {
-        return categories;
-    }
+//    public void setCategories(List<String> categories) {
+//        this.categories = categories;
+//    }
+//
+//    public List<String> getCategories() {
+//        return categories;
+//    }
 
     public void setLogo(byte[] logo) {
         this.logo = logo;

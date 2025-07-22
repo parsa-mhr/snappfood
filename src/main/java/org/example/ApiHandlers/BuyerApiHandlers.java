@@ -1,11 +1,13 @@
 package org.example.ApiHandlers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Details.Cart;
+import org.example.Details.CartItem;
 import org.example.Models.*;
 import org.example.Security.jwtSecurity;
 import org.example.Services.*;
@@ -13,17 +15,15 @@ import org.example.Restaurant.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.User.Buyer;
 import org.example.Validation.TokenUserValidator;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.example.ApiHandlers.HttpUtils.sendMethodNotAllowed;
 
@@ -37,7 +37,7 @@ public class BuyerApiHandlers {
     private static final FavoriteService favoriteService = new FavoriteService();
     private static final RatingService ratingService = new RatingService();
     private static final jwtSecurity jwtSecurity = new jwtSecurity();
-    private static SessionFactory sessionFactory;
+    private static SessionFactory sessionFactory ;
 
     // POST /vendors
     public static class VendorSearchHandler implements HttpHandler {
@@ -60,10 +60,11 @@ public class BuyerApiHandlers {
             }
 
             List<Restaurant> vendors = service.findByFilter(filter);
+            System.out.println(vendors);
             List<VendorsDto> dtoList = vendors.stream()
                     .map(r -> new VendorsDto(r.getId(), r.getName(), r.getAddress(), r.getPhone() , r.getLogoBase64() , r.getTaxFee() , r.getAdditionalFee()))
                     .toList();
-            sendJson(exchange, 200, vendors);
+            sendJson(exchange, 200, dtoList);
         }
     }
 
@@ -75,13 +76,16 @@ public class BuyerApiHandlers {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
             try {
                 int id = parseId(exchange);
-                Optional<Restaurant> opt = restaurantService.getById(id);
-                if (opt.isEmpty()) { sendError(exchange,404,"Not found"); return; }
-                sendJson(exchange,200,opt.get());
+                List<MenuItem> opt = restaurantService.getById(id);
+                if (opt.size() == 0) { sendError(exchange,404,"Not found"); return; }
+                List<MenuItemDto> dtoList = opt.stream()
+                        .map(mi -> new MenuItemDto(mi.getId() , mi.getName(), mi.getImageBase64(), mi.getDescription(), Math.toIntExact(mi.getRestaurant().getId()), mi.getPrice(), mi.getSupply()))
+                        .toList();
+                sendJson(exchange,200,dtoList);
             } catch (NumberFormatException e) {
                 sendError(exchange,400,"Invalid ID");
             } catch (Exception e) {
-                sendError(exchange,500,"Server error");
+                sendError(exchange,500 , e.getMessage());
             }
         }
     }
@@ -107,14 +111,14 @@ public class BuyerApiHandlers {
                     dto.vendor_id = item.getRestaurant().getId().intValue();
                     dto.price = item.getPrice();
                     dto.supply = item.getSupply();
-                    dto.keywords = item.getKeywords(); // فعلاً category رو جای keywords می‌ذاریم
+                 //   dto.keywords = item.getKeywords(); // فعلاً category رو جای keywords می‌ذاریم
                     return dto;
                 }).toList();
-                sendJson(exchange,200,items);
+                sendJson(exchange,200,list);
             } catch (JsonSyntaxException|NullPointerException e) {
                 sendError(exchange,400,"Invalid payload");
             } catch (Exception e) {
-                sendError(exchange,500,"Server error");
+                sendError(exchange,500,e.getMessage());
             }
         }
     }
@@ -128,7 +132,16 @@ public class BuyerApiHandlers {
                 int id = parseId(exchange);
                 Optional<MenuItem> opt = itemService.getById(id);
                 if (opt.isEmpty()) { sendError(exchange,404,"Not found"); return; }
-                sendJson(exchange,200,opt.get());
+                MenuItemDto dto = new MenuItemDto();
+                MenuItem item = opt.get();
+                dto.id = item.getId();
+                dto.name = item.getName();
+                dto.description = item.getDescription();
+                dto.vendor_id = item.getRestaurant().getId().intValue();
+                dto.price = item.getPrice();
+                dto.supply = item.getSupply();
+                dto.imageBase64 = item.getImageBase64();
+                sendJson(exchange,200,dto);
             } catch (NumberFormatException e) {
                 sendError(exchange,400,"Invalid ID");
             } catch (Exception e) {
@@ -176,7 +189,7 @@ public class BuyerApiHandlers {
                 CreateOrderReq request = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), CreateOrderReq.class);
 
                 // فرض: خریدار (Buyer) از سشن یا توکن خوانده می‌شود:
-                String token = exchange.getRequestHeaders().getFirst("Authorization");
+                String token = exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , "");
                 TokenUserValidator tokenvalidate = new TokenUserValidator(sessionFactory) ;
 
                 Buyer buyer = (Buyer) tokenvalidate.validate(token); // extract from jwt;
@@ -223,14 +236,28 @@ public class BuyerApiHandlers {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
             try {
                 //extract from jwt
-                long id = org.example.Security.jwtSecurity.getUserId(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""));
-                HistoryBody body = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), HistoryBody.class);
-                List<Cart> hist = orderService.getHistory((int) id);
-                sendJson(exchange,200,hist);
+                long id = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""))).getId();
+                List<OrderResponseDto> hist = orderService.getHistory((int) id);
+
+//                List<OrderResponseDto> dtos = new ArrayList<>();
+//                for (Cart cart : hist) {
+//                    String resaurantname= cart.getRestaurant().getName();
+//                    Long vendor_id = cart.getRestaurant().getId();
+//                    cart.getRestaurant().setSeller(null);
+//                    dtos.add(new CartDto(cart , resaurantname, vendor_id));
+//                }
+                Gson localgson = new GsonBuilder()
+                        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                        .create();
+                System.out.println(localgson.toJson(hist).toString());
+                sendJson(exchange,200, hist);
+
             } catch (Exception e) {
-                sendError(exchange,400,"Invalid query");
-            }
+            e.printStackTrace();          // ← این رو اضافه کنید
+            sendError(exchange, 400, e.getMessage());
         }
+
+    }
     }
 
     // GET /favorites
@@ -240,75 +267,70 @@ public class BuyerApiHandlers {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
             try {
                 // extract from jwt
-                long id = org.example.Security.jwtSecurity.getUserId(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""));
+                long id = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""))).getId();
                 List<Favorite> list = favoriteService.listFavorites((int) id);
+                for (Favorite favorite : list) {
+                    favorite.getRestaurant().setSeller(null);
+                }
                 sendJson(exchange,200,list);
             } catch (Exception e) {
-                sendError(exchange,400,"Invalid query");
+                sendError(exchange,400,e.getMessage());
             }
         }
     }
 
-    // POST /favorites/{restaurantID}
+    // PUT /favorites/{restaurantID}
     public static class FavoriteAddHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
-                sendEmpty(exchange, 405);
-                return;
+            if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+
+                System.out.println("entered");
+                try {
+                    long id = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer ", ""))).getId();
+
+                    // 2. استخراج restaurantId از URL
+                    String path = exchange.getRequestURI().getPath(); // مثلا "/favorites/42"
+                    String[] parts = path.split("/");
+                    if (parts.length < 3) {
+                        sendError(exchange, 400, "Restaurant ID not found in URL");
+
+                    }
+                    int restaurantId = Integer.parseInt(parts[2]);
+//عوض شده
+                    Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+                    if (restaurant == null) {
+                        sendError(exchange, 404, "Restaurant not found");
+                        return;
+                    }
+
+                    Favorite fav = new Favorite();
+                    fav.setBuyerId((int) id);
+                    fav.setRestaurant(restaurant);
+
+                    Favorite saved = favoriteService.addFavorite(fav);
+                    saved.getRestaurant().setSeller(null);
+                    sendJson(exchange, 201, saved);
+
+                } catch (NumberFormatException e) {
+                    sendError(exchange, 400, "Invalid restaurant ID");
+                } catch (JsonSyntaxException e) {
+                    sendError(exchange, 400, "Invalid payload");
+                } catch (Exception e) {
+                    sendError(exchange, 500, "Internal server error");
+                    e.printStackTrace();
+                }
             }
 
-            try {
-                // 1. استخراج user id از JWT
-                int buyerId = 0; // =  parseBuyerId(exchange); // ← باید این متد را پیاده‌سازی یا فراخوانی کنی
-
-                // 2. استخراج restaurantId از URL
-                String path = exchange.getRequestURI().getPath(); // مثلا "/favorites/add/42"
-                String[] parts = path.split("/");
-                if (parts.length < 4) {
-                    sendError(exchange, 400, "Restaurant ID not found in URL");
-                    return;
+            if (exchange.getRequestMethod().equalsIgnoreCase("DELETE")) {
+                try {
+                    int rid = parseId(exchange);
+                    long buyerId = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer ", ""))).getId();
+                    boolean ok = favoriteService.removeFavorite((int) buyerId, rid);
+                    sendEmpty(exchange, ok ? 204 : 404);
+                } catch (Exception e) {
+                    sendError(exchange, 400, "Invalid request");
                 }
-                int restaurantId = Integer.parseInt(parts[3]);
-
-                Restaurant restaurant = restaurantService.getById(restaurantId).get();
-                if (restaurant == null) {
-                    sendError(exchange, 404, "Restaurant not found");
-                    return;
-                }
-
-                Favorite fav = new Favorite();
-                fav.setBuyerId(buyerId);
-                fav.setRestaurant(restaurant);
-
-                Favorite saved = favoriteService.addFavorite(fav);
-
-                sendJson(exchange, 201, saved);
-
-            } catch (NumberFormatException e) {
-                sendError(exchange, 400, "Invalid restaurant ID");
-            } catch (JsonSyntaxException e) {
-                sendError(exchange, 400, "Invalid payload");
-            } catch (Exception e) {
-                sendError(exchange, 500, "Internal server error");
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    // DELETE /favorites/{restaurantId}
-    public static class FavoriteRemoveHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("DELETE")) { sendEmpty(exchange,405); return; }
-            try {
-                int rid = parseId(exchange);
-                int buyerId = 0; // jwt extract // Integer.parseInt(exchange.getRequestURI().getQuery().split("=")[1]);
-                boolean ok = favoriteService.removeFavorite(buyerId,rid);
-                sendEmpty(exchange, ok?204:404);
-            } catch (Exception e) {
-                sendError(exchange,400,"Invalid request");
             }
         }
     }
@@ -318,9 +340,43 @@ public class BuyerApiHandlers {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) { sendEmpty(exchange,405); return; }
-           Rating rating = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), Rating.class);
-            Rating rated = ratingService.addRating(rating);
-            sendJson(exchange,200,"Rating submitted");
+            RatingRequest req = gson.fromJson(
+                    new InputStreamReader(exchange.getRequestBody()),
+                    RatingRequest.class
+            );
+            Cart cart = orderService.getCartById(req.getOrder_id());
+            if (cart == null) {
+                sendError(exchange, 404, "Order not found");
+                return;
+            }
+            List<MenuItem> menuItems = new ArrayList<>();
+            Rating rating = new Rating();
+            rating.setOrder_id(cart);
+            rating.setRating(req.getRating());
+            rating.setComment(req.getComment());
+            for (CartItem item : cart.getItems()) {
+                menuItems.add(item.getMenuItem());
+                item.getMenuItem().setKeywords(null);
+            }
+            rating.setItems(menuItems);
+            long BuyerId = 0;
+            try {
+                BuyerId = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer ", ""))).getId();
+
+            }catch (Exception e) {
+                sendError(exchange, 401, "login again");
+            }
+            rating.setBuyerId((int) BuyerId);
+            if (req.getImageBase64() != null && !req.getImageBase64().isEmpty()) {
+                rating.setImageBase64(req.getImageBase64().get(0));
+            }
+            try {
+                Rating rated = ratingService.addRating(rating);
+                sendJson(exchange,200,"Rating submitted"+ "Rating id :" + rated.getId());
+            }catch (Exception e) {
+                sendError(exchange, 400, "Rating submitted on this order before");
+            }
+
         }
     }
 
@@ -331,10 +387,10 @@ public class BuyerApiHandlers {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
             try {
                 int iid = parseId(exchange);
-                List<Rating> list = ratingService.listByItem(iid);
+                List<RatingResponseDto> list = ratingService.listByItem(iid);
                 sendJson(exchange,200,list);
             } catch (Exception e) {
-                sendError(exchange,400,"Invalid ID");
+                sendError(exchange,400,e.getMessage());
             }
         }
     }
@@ -346,14 +402,13 @@ public class BuyerApiHandlers {
             if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
                 try {
                     int id = parseId(exchange);
-                    Optional<Rating> opt = ratingService.getById(id);
-                    if (opt.isEmpty()) {
-                        sendError(exchange, 404, "Not found");
-                        return;
-                    }
-                    sendJson(exchange, 200, opt.get());
+                    RatingResponseDto rating = ratingService.getById(id);
+                    if (rating == null) {
+                        sendError(exchange, 404, "Rating not found");
+                    }else
+                    sendJson(exchange, 200, rating);
                 } catch (Exception e) {
-                    sendError(exchange, 400, "Invalid ID");
+                    sendError(exchange, 400, e.getMessage());
                 }
             }
 
@@ -374,19 +429,36 @@ public class BuyerApiHandlers {
 
             //PUT /ratings/{id}
 
-           else if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+else if (exchange.getRequestMethod().equalsIgnoreCase("PUT")) {
+    RatingRequest body = new RatingRequest();
+    try{
+    body = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), RatingRequest.class);
+}catch (Exception e){
+    sendError(exchange, 400, e.getMessage());
+    }
+    if (body.getRating() == null || body.getComment() == null) {
+        sendError(exchange, 400, "Missing required fields");
+        return;
+    }
 
-                Rating body = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), Rating.class);
-                try {
-                    int id = parseId(exchange);
-                    Rating rating = ratingService.updateRating(body.getScore(), body.getComment(), body.getImageBase64(), id);
-                    HttpUtils.sendJson(exchange, 200, String.valueOf(rating));
-                } catch (Exception e) {
-                    sendError(exchange, 400, "Invalid ID");
-                }
+    try {
+        int id = parseId(exchange);
+        Rating rating = ratingService.updateRating(body.getRating(), body.getComment(), body.getImageBase64(), id);
 
-            }else
-                sendError(exchange , 405 , "invalid req");
+        if (rating == null) {
+            sendError(exchange, 404, "Rating not found");
+        } else {
+            HttpUtils.sendJson(exchange, 200, "rating updated successfuly");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        sendError(exchange, 400, "Invalid ID or body");
+    }
+
+} else {
+    sendError(exchange , 405 , "Invalid request method");
+}
+
         }
     }
 

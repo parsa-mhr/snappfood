@@ -15,30 +15,46 @@ public class ItemService {
 
     public List<MenuItem> findByFilter(ItemsFilter filter) {
         try (Session s = factory.openSession()) {
-            String hql = "FROM MenuItem i WHERE 1=1";
+            String hql = "SELECT DISTINCT mi FROM MenuItem mi";
+
+            // فقط اگه keywords غیرخالی باشه، جوین اضافه بشه
+            if (filter.getKeywords() != null && !filter.getKeywords().isEmpty()) {
+                hql += " LEFT JOIN mi.keywords k";
+            }
+            hql += " WHERE 1=1";
 
 
-            if (filter.getSearch() != null)
-                hql += " AND i.name LIKE :search";
-
-            if (filter.getPrice() != null)
-                hql += " AND i.price <= :price";
-
-            if (filter.getKeywords() != null && !filter.getKeywords().isEmpty())
-                hql += " AND i.keywords IN (:kw)";  // فرض بر این است که فیلد keywords از نوع `String` یا مجموعه‌ای از تگ‌ها است
+            // اضافه کردن شرط‌ها
+            if (filter.getSearch() != null && !filter.getSearch().trim().isEmpty()) {
+                hql += " AND mi.name LIKE :search";
+            }
+            if (filter.getPrice() != null) {
+                hql += " AND mi.price <= :price";
+            }
+            if (filter.getKeywords() != null && !filter.getKeywords().isEmpty()) {
+                hql += " AND k IN :keywords";
+            }
 
             Query<MenuItem> q = s.createQuery(hql, MenuItem.class);
 
-            if (filter.getSearch() != null)
-                q.setParameter("search", "%" + filter.getSearch() + "%");
-
-            if (filter.getPrice() != null)
+            // تنظیم پارامترها
+            if (filter.getSearch() != null && !filter.getSearch().trim().isEmpty()) {
+                q.setParameter("search", "%" + filter.getSearch().trim() + "%");
+            }
+            if (filter.getPrice() != null) {
                 q.setParameter("price", filter.getPrice());
+            }
+            if (filter.getKeywords() != null && !filter.getKeywords().isEmpty()) {
+                q.setParameter("keywords", filter.getKeywords());
+            }
 
-            if (filter.getKeywords() != null && !filter.getKeywords().isEmpty())
-                q.setParameter("kw", filter.getKeywords());
-
-            return q.list();
+            List<MenuItem> result = q.getResultList();
+            System.out.println("Found " + result.size() + " menu items");
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error in searchMenuItems: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
 
