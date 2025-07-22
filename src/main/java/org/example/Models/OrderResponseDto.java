@@ -1,5 +1,10 @@
 package org.example.Models;
 
+import org.example.Details.Cart;
+import org.example.Details.CartItem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -139,4 +144,28 @@ public class OrderResponseDto {
     public void setUpdated_at(String updated_at) {
         this.updated_at = updated_at;
     }
+
+    public OrderResponseDto(Cart cart) {
+        this.id = id;
+        this.delivery_address = cart.getDelivery_address();
+        this.customer_id = cart.getBuyer() == null ? null :cart.getBuyer().getId();
+        this.vendor_id = cart.getRestaurant() == null ? null :cart.getRestaurant().getId();
+        this.coupon_id = cart.getCoupon() == null ? null : cart.getCoupon().getId();
+        Map<Long , Integer> list = new HashMap<>() ;
+
+        for (CartItem item : cart.getItems())
+            list.put(item.getId() , item.getQuantity());
+
+        this.item_ids = list;
+        this.raw_price = cart.getPay_price();
+        this.tax_fee = cart.getRestaurant().getTaxFee();
+        this.additional_fee = cart.getRestaurant() == null ? null : cart.getRestaurant().getAdditionalFee();
+        this.courier_fee = 30000;
+        this.pay_price = cart.getPay_price();
+        this.courier_id = Long.valueOf(cart.getCourier_Id());
+        this.status = String.valueOf(cart.getStatus());
+        this.created_at = String.valueOf(cart.getCreatedAt());
+        this.updated_at = String.valueOf(cart.getUpdatedAt());
+    }
+    public OrderResponseDto (){}
 }

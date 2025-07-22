@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Details.Cart;
 import org.example.Details.CartItem;
+import org.example.Details.Coupon;
 import org.example.Models.*;
 import org.example.Security.jwtSecurity;
 import org.example.Services.*;

@@ -3,6 +3,8 @@ package org.example.User;
 import jakarta.persistence.*;
 import org.example.Security.PasswordUtil;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -38,6 +40,12 @@ public abstract class User {
     @Column(nullable = true)
     protected String adress;
 
+    @Column
+    protected String status; // approved, rejected
+
+    @Column(name = "created_at")
+    protected LocalDateTime createdAt = LocalDateTime.now();
+
     public User(String fullName, String email, String password, String phonenumber, String adress) {
         this.fullName = fullName;
         this.email = email;
@@ -47,6 +55,34 @@ public abstract class User {
     }
 
     public User() {
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getAdress() {
+        return adress;
+    }
+
+    public void setAdress(String adress) {
+        this.adress = adress;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getId() {

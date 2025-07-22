@@ -1,6 +1,6 @@
 package org.example.Services;
 
-import org.example.Models.Coupon;
+import org.example.Details.Coupon;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

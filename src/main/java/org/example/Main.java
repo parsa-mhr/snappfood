@@ -90,6 +90,15 @@ public class Main {
         server.createContext("/deliveries/available", new CourierApiHandler.AvailableHandler());
         server.createContext("/deliveries/history", new CourierApiHandler.HistoryHandler());
         server.createContext("/deliveries", new CourierApiHandler.UpdateStatusHandler());
+        server.createContext("/transactions", new TransactionsApiHandlers.TransactionsListHandler());
+        server.createContext("/wallet/top-up", new TransactionsApiHandlers.WalletTopUpHandler());
+        server.createContext("/payment/online", new TransactionsApiHandlers.PaymentOnlineHandler());
+        server.createContext("/admin/users", new TransactionsApiHandlers.AdminUsersListHandler());
+        server.createContext("/admin/users/" , new TransactionsApiHandlers.AdminUserStatusHandler());
+        server.createContext("/admin/orders" , new TransactionsApiHandlers.AdminOrdersListHandler());
+        server.createContext("/admin/transactions" , new TransactionsApiHandlers.AdminTransactionsListHandler());
+        server.createContext("/admin/coupons" , new AdminCouponsHandler());
+
 //
 
         server.setExecutor(null);

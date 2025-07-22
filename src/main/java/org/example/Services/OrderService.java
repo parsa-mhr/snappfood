@@ -1,9 +1,10 @@
 package org.example.Services;
 
+import org.example.DAO.OrderDAO;
 import org.example.Details.Cart;
 import org.example.Details.CartItem;
+import org.example.Details.Coupon;
 import org.example.Details.OrderStatus;
-import org.example.Models.Coupon;
 import org.example.Models.CreateOrderReq;
 import org.example.Models.HistoryBody;
 import org.example.Models.OrderResponseDto;
@@ -14,14 +15,13 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Order;
 import org.hibernate.query.Query;
 
 import java.util.*;
 
 public class OrderService {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
-
+    OrderDAO orderDAO = new OrderDAO(factory);
     public OrderResponseDto createOrder(CreateOrderReq request, Buyer buyer) {
         try (Session session = factory.openSession()) {
             session.beginTransaction();
@@ -40,6 +40,7 @@ public class OrderService {
             cart.setCoupon(coupon);
             cart.setDelivery_address(request.delivery_address);
             cart.setStatus(OrderStatus.SUBMITTED);
+            long rawPrice = 0;
 
             for (CreateOrderReq.ItemRequest itemRequest : request.items) {
                 MenuItem menuItem = session.get(MenuItem.class, itemRequest.item_id);
@@ -47,7 +48,9 @@ public class OrderService {
 
                 CartItem cartItem = new CartItem(cart, menuItem, itemRequest.quantity);
                 cart.getItems().add(cartItem);
+                rawPrice += (long) cartItem.getMenuItem().getPrice() * cartItem.getQuantity();
             }
+            cart.setPay_price((long) (rawPrice * 1.09));
 
             session.save(cart);
             session.getTransaction().commit();
@@ -167,4 +170,14 @@ public class OrderService {
         }
 
 
+    public List<OrderResponseDto> findAll() {
+        System.out.println("OrderService.findAll called"); // Debug log
+        List<Cart> orders = orderDAO.findAll();
+        System.out.println("Carts fetched: " + orders.size()); // Debug log
+        List<OrderResponseDto> list = new ArrayList<>();
+        for (Cart cart : orders) {
+            list.add(toResponse(cart));
+        }
+        return list;
+    }
 }

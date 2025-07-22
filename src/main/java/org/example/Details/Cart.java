@@ -1,11 +1,8 @@
 package org.example.Details;
 
 import jakarta.persistence.*;
-import org.example.Models.Coupon;
 import org.example.Restaurant.Restaurant;
 import org.example.User.Buyer;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
