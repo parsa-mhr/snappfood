@@ -90,7 +90,7 @@ public class Main {
         server.createContext("/deliveries/available", new CourierApiHandler.AvailableHandler());
         server.createContext("/deliveries/history", new CourierApiHandler.HistoryHandler());
         server.createContext("/deliveries", new CourierApiHandler.UpdateStatusHandler());
-
+//
 
         server.setExecutor(null);
         server.start();
