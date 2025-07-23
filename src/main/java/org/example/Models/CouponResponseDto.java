@@ -10,6 +10,7 @@ public class CouponResponseDto {
     private Long id;
     private String code;
     private BigDecimal discount;
+    private BigDecimal min_price ;
     private String discountType;
     private Integer maxUses;
     private Integer usedCount;
@@ -29,6 +30,15 @@ public class CouponResponseDto {
         this.status = coupon.getStatus();
         this.createdAt = coupon.getCreatedAt() != null ?
                 coupon.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+        this.min_price = coupon.getMin_price();
+    }
+
+    public BigDecimal getMin_price() {
+        return min_price;
+    }
+
+    public void setMin_price(BigDecimal min_price) {
+        this.min_price = min_price;
     }
 
     public Long getId() { return id; }

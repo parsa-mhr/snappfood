@@ -37,7 +37,18 @@ public class Coupon {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column
+    private BigDecimal min_price ;
+
     public Coupon() {
+    }
+
+    public BigDecimal getMin_price() {
+        return min_price;
+    }
+
+    public void setMin_price(BigDecimal min_price) {
+        this.min_price = min_price;
     }
 
     public Long getId() { return id; }

@@ -12,6 +12,7 @@ public class CouponRequestDto {
     private String start_date ;
     private BigDecimal min_price ;// به صورت String برای JSON
 
+
     public String getCoupon_code() {
         return coupon_code;
     }

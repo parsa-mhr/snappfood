@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -99,7 +100,7 @@ public class AdminCouponsHandler implements HttpHandler {
         EntityTransaction tx = em.getTransaction();
         try {
             CouponRequestDto request = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), CouponRequestDto.class);
-            if (request == null || request.getCode() == null || request.getDiscount() == null || request.getDiscountType() == null) {
+            if (request == null || request.getCode() == null || request.getDiscount() == null || request.getDiscountType() == null || request.getMin_price() == null) {
                 sendError(exchange, 400, "Invalid payload: code, discount, and discountType are required");
                 return;
             }
@@ -115,11 +116,11 @@ public class AdminCouponsHandler implements HttpHandler {
             coupon.setCode(request.getCode());
             coupon.setDiscount(request.getDiscount());
             coupon.setDiscountType(request.getDiscountType());
+            coupon.setMin_price(request.getMin_price());
             coupon.setMaxUses(request.getMaxUses() != null ? request.getMaxUses() : 0);
             coupon.setUsedCount(0);
             if (request.getEnd_date() != null) {
-                coupon.setExpirationDate(LocalDateTime.parse(request.getEnd_date(), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            }
+                coupon.setExpirationDate(LocalDate.parse(request.getEnd_date(), DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay());            }
             coupon.setStatus("active");
 
             tx.begin();
@@ -190,6 +191,8 @@ public class AdminCouponsHandler implements HttpHandler {
             if (request.getEnd_date() != null) {
                 coupon.setExpirationDate(LocalDateTime.parse(request.getEnd_date(), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             }
+            if (request.getMin_price() != null)
+                coupon.setMin_price(request.getMin_price());
 
             tx.begin();
             em.merge(coupon);
