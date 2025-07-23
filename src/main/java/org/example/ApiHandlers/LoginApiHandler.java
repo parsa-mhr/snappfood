@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.example.Security.jwtSecurity;
 import org.example.User.User;
 import org.example.Unauthorized.UnauthorizedException;
 import org.example.Validation.ExistUser;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.example.Security.jwtSecurity;
 import static org.example.ApiHandlers.SendJson.jsonError;
 import static org.example.ApiHandlers.SendJson.sendJson;
 
@@ -109,11 +111,7 @@ public class LoginApiHandler implements HttpHandler {
             }
 
             // تولید توکن JWT
-            String token = JWT.create()
-                    .withSubject(String.valueOf(user.getId()))
-                    .withIssuer(ISSUER)
-                    .withExpiresAt(new java.util.Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                    .sign(Algorithm.HMAC256(SECRET));
+            String token = jwtSecurity.generateToken(user.getId(), user.getRole().name());
 
             // ارسال پاسخ موفقیت‌آمیز
             sendJson(exchange, 200, gson.toJson(Map.of(

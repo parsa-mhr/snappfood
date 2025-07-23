@@ -96,7 +96,7 @@ public class TransactionsApiHandlers {
                 token = token.replace("Bearer ", "");
                 System.out.println("Validating token: " + token); // Debug log
                 User user = new TokenUserValidator(sessionFactory).validate(token);
-                if (user == null || !(user instanceof Buyer || user instanceof Seller || user instanceof Courier)) {
+                if ( user == null || !(user instanceof Buyer || user instanceof Seller || user instanceof Courier)) {
                     HttpUtils.sendError(exchange, 403, "Access denied");
                     return;
                 }
@@ -175,8 +175,8 @@ public class TransactionsApiHandlers {
                 if (user == null /*|| user.getRole() != UserRole.ADMIN*/) {
                     HttpUtils.sendError(exchange, 403, "Access denied: Admin role required");
                     return;
-                }
-                System.out.println("Fetching all users..."); // Debug log
+                 }
+//                System.out.println("Fetching all users..."); // Debug log
                 List<User> users = userService.getAllUsers();
                 List<UserResponseDto> responseDtos = users.stream()
                         .map(UserResponseDto::new)

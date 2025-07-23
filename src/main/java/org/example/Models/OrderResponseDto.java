@@ -20,7 +20,7 @@ public class OrderResponseDto {
     public double additional_fee;
     public double courier_fee;
     public double pay_price;
-    public Long courier_id;
+    public String courier_id;
     public String status;
     public String created_at;
     public String updated_at;
@@ -113,12 +113,12 @@ public class OrderResponseDto {
         this.pay_price = pay_price;
     }
 
-    public Long getCourier_id() {
+    public String getCourier_id() {
         return courier_id;
     }
 
     public void setCourier_id(Long courier_id) {
-        this.courier_id = courier_id;
+        this.courier_id = String.valueOf(courier_id);
     }
 
     public String getStatus() {
@@ -162,7 +162,7 @@ public class OrderResponseDto {
         this.additional_fee = cart.getRestaurant() == null ? null : cart.getRestaurant().getAdditionalFee();
         this.courier_fee = 30000;
         this.pay_price = cart.getPay_price();
-        this.courier_id = Long.valueOf(cart.getCourier_Id());
+        this.courier_id = String.valueOf(cart.getCourier_Id());
         this.status = String.valueOf(cart.getStatus());
         this.created_at = String.valueOf(cart.getCreatedAt());
         this.updated_at = String.valueOf(cart.getUpdatedAt());

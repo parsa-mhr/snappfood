@@ -8,6 +8,7 @@ import org.example.Details.Cart;
 import org.example.Details.CartItem;
 import org.example.Details.OrderStatus;
 import org.example.Models.OrderResponseDto;
+import org.example.User.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -41,27 +42,31 @@ public class DeliveryService {
     }
 
     // تاریخچه سفارش‌ها
-    public List<OrderResponseDto> getDeliveryHistory(String query) {
+    public List<OrderResponseDto> getDeliveryHistory(String query , Long id) {
         try (Session session = sessionFactory.openSession()) {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Cart> cq = cb.createQuery(Cart.class);
             Root<Cart> root = cq.from(Cart.class);
-            // فیلترها در parseQuery داخلی قابل توسعه هستند
+
+            // فیلتر: فقط کارت‌هایی که courier_id == id دارند
+            cq.where(cb.equal(root.get("Courier_Id"), id));
+
             List<Cart> carts = session.createQuery(cq).list();
             return carts.stream().map(this::toDto).collect(Collectors.toList());
         }
     }
 
     // تغییر وضعیت مستقیم (PATCH)
-    public OrderResponseDto updateDeliveryStatus(String orderId, String newStatus) {
+    public OrderResponseDto updateDeliveryStatus(String orderId, String newStatus , Long Userid) {
         Transaction tx = null;
         Long id = Long.valueOf(orderId);
-        if (newStatus.equals("ON_THE_WAY") || newStatus.equals("COMPLETED")) {
+        if (newStatus.equals("ON_THE_WAY") || newStatus.equals("COMPLETED") || newStatus.equals("COURIER_ACCEPTED")) {
             try (Session session = sessionFactory.openSession()) {
                 tx = session.beginTransaction();
                 Cart cart = session.get(Cart.class, id);
                 if (cart == null) throw new RuntimeException("Order not found: " + id);
                 cart.setStatus(OrderStatus.valueOf(newStatus));
+                cart.setCourier_Id(String.valueOf(Userid));
                 session.update(cart);
                 tx.commit();
                 return toDto(cart);
@@ -135,7 +140,7 @@ public class DeliveryService {
         res.courier_fee = 30000; // عدد فرضی
         res.pay_price = res.raw_price + res.tax_fee + res.additional_fee + res.courier_fee;
         cart.setPay_price((long) res.pay_price);
-        res.courier_id = null; // در لحظه سفارش‌گذاری تعیین نمی‌شود
+        res.courier_id = cart.getCourier_Id(); // در لحظه سفارش‌گذاری تعیین نمی‌شود
         res.status = cart.getStatus().toString();
 
         res.created_at = cart.getCreatedAt().toString();

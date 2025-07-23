@@ -15,7 +15,7 @@ public class jwtSecurity {
         return JWT.create()
                 .withClaim("userId", userId)
                 .withClaim("role", role)
-                .withIssuer("food-app")
+                .withIssuer("aut_food")
                 .withJWTId(UUID.randomUUID().toString())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC256(SECRET));
@@ -23,7 +23,7 @@ public class jwtSecurity {
 
     public static DecodedJWT verifyToken(String token) {
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET))
-                .withIssuer("food-app")
+                .withIssuer("aut_food")
                 .build();
         return verifier.verify(token);
     }

@@ -160,7 +160,7 @@ public class OrderService {
             res.courier_fee = 30000; // عدد فرضی
             res.pay_price = res.raw_price + res.tax_fee + res.additional_fee + res.courier_fee;
             cart.setPay_price((long) res.pay_price);
-            res.courier_id = null; // در لحظه سفارش‌گذاری تعیین نمی‌شود
+            res.courier_id = cart.getCourier_Id(); // در لحظه سفارش‌گذاری تعیین نمی‌شود
             res.status = cart.getStatus().toString();
 
             res.created_at = cart.getCreatedAt().toString();

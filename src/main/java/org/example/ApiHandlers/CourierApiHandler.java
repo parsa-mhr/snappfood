@@ -7,6 +7,9 @@ import org.example.Services.DeliveryService;
 import org.example.Models.OrderResponseDto;
 import org.example.Models.UpdateDeliveryStatusRequest;
 import com.google.gson.Gson;
+import org.example.User.User;
+import org.example.Validation.TokenUserValidator;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -48,9 +51,15 @@ public class CourierApiHandler {
                 sendEmpty(exchange, 405);
                 return;
             }
-            String query = exchange.getRequestURI().getQuery();
-            List<OrderResponseDto> list = deliveryService.getDeliveryHistory(query);
-            sendJson(exchange, 200, list);
+            TokenUserValidator validator = new TokenUserValidator();
+            User user = validator.validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""));
+            if (user == null)
+                sendError(exchange , 401 , "token is not authorized");
+            else {
+                String query = exchange.getRequestURI().getQuery();
+                List<OrderResponseDto> list = deliveryService.getDeliveryHistory(query , user.getId());
+                sendJson(exchange, 200, list);
+            }
         }
     }
 
@@ -65,6 +74,11 @@ public class CourierApiHandler {
                 sendEmpty(exchange, 405);
                 return;
             }
+            TokenUserValidator validator = new TokenUserValidator();
+            User user = validator.validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""));
+            if (user == null)
+                sendError(exchange , 401 , "token is not authorized");
+
             String path = exchange.getRequestURI().getPath();
             String[] parts = path.split("/");
             if (parts.length < 3) {
@@ -82,7 +96,7 @@ public class CourierApiHandler {
             }
 
             try {
-                OrderResponseDto updated = deliveryService.updateDeliveryStatus(orderId, req.getStatus());
+                OrderResponseDto updated = deliveryService.updateDeliveryStatus(orderId, req.getStatus() , user.getId());
                 sendJson(exchange, 200, updated);
             } catch (RuntimeException e) {
                 sendError(exchange, 404, e.getMessage());

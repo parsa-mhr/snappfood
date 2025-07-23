@@ -9,5 +9,5 @@ public enum OrderStatus {
     ON_THE_WAY,
     COMPLETED,
     ACCEPTED ,
-    Pending
+    COURIER_ACCEPTED
 }

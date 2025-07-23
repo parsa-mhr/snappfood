@@ -15,7 +15,7 @@ import org.hibernate.cfg.Configuration;
  */
 public class TokenUserValidator {
     private final SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-    private static final String SECRET = "your_jwt_secret_key"; // کلید مخفی JWT
+    private static final String SECRET = "my-secret-key"; // کلید مخفی JWT
     private static final String ISSUER = "aut_food"; // صادرکننده توکن
 
     /**
@@ -24,6 +24,7 @@ public class TokenUserValidator {
      */
     public TokenUserValidator(SessionFactory sessionFactory) {
     }
+    public TokenUserValidator (){}
 
     /**
      * اعتبارسنجی توکن و دریافت کاربر
@@ -40,7 +41,7 @@ public class TokenUserValidator {
                     .verify(token);
 
             // استخراج userId از توکن
-            String userId = jwt.getSubject();
+            String userId = jwt.getClaim("userId").toString();
             if (userId == null) {
                 throw new UnauthorizedException("شناسه کاربر در توکن یافت نشد", "MISSING_USER_ID");
             }
