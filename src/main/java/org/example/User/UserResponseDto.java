@@ -2,6 +2,8 @@ package org.example.User;
 
 import org.example.User.User;
 import org.example.User.UserRole;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,8 +16,17 @@ public class UserResponseDto {
     private String status;
     private UserRole role;
     private String createdAt;
+    private BigDecimal walletBalance;
 
-    public UserResponseDto(User user) {
+    public BigDecimal getWalletBalance() {
+        return walletBalance;
+    }
+
+    public void setWalletBalance(BigDecimal walletBalance) {
+        this.walletBalance = walletBalance;
+    }
+
+    public UserResponseDto(User user , BigDecimal walletBalance) {
         this.id = user.getId();
         this.fullName = user.getFullName();
         this.email = user.getEmail();
@@ -25,7 +36,9 @@ public class UserResponseDto {
         this.role = user.getRole();
         this.createdAt = user.getCreatedAt() != null ?
                 user.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+        this.walletBalance = walletBalance;
     }
+
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

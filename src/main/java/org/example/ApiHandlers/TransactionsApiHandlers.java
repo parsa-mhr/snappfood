@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import org.example.DAO.OrderDAO;
 import org.example.DAO.TransactionDAO;
 import org.example.DAO.UserDAO;
+import org.example.DAO.WalletDAO;
 import org.example.Details.Cart;
 import org.example.Models.*;
 import org.example.Services.*;
@@ -17,6 +18,7 @@ import org.hibernate.SessionFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ public class TransactionsApiHandlers {
     private static final UserService userService;
     private static final OrderService orderService;
     private static final OrderDAO orderDAO;
+    private static final WalletDAO walletDAO;
 
     static {
         sessionFactory = new org.hibernate.cfg.Configuration().configure().buildSessionFactory();
@@ -42,6 +45,7 @@ public class TransactionsApiHandlers {
         userService = new UserService(sessionFactory);
         orderDAO = new OrderDAO(sessionFactory);
         orderService = new OrderService();
+        walletDAO = new WalletDAO(sessionFactory);
     }
 
     // GET /transactions
@@ -179,7 +183,10 @@ public class TransactionsApiHandlers {
 //                System.out.println("Fetching all users..."); // Debug log
                 List<User> users = userService.getAllUsers();
                 List<UserResponseDto> responseDtos = users.stream()
-                        .map(UserResponseDto::new)
+                        .map(useres -> {
+                            BigDecimal balance = walletDAO.findBalanceByUserId(useres.getId());
+                            return new UserResponseDto(useres, balance);
+                        })
                         .collect(Collectors.toList());
                 HttpUtils.sendJson(exchange, 200, responseDtos);
             } catch (Exception e) {

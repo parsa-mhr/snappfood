@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.example.DAO.WalletDAO;
 import org.example.Details.Cart;
 import org.example.Details.OrderStatus;
+import org.example.Models.Wallet;
 import org.example.Restaurant.Restaurant;
 import org.example.User.User;
 import org.example.User.UserRole;
@@ -16,6 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,10 +34,12 @@ import static org.example.ApiHandlers.SendJson.sendJson;
 public class RestaurantOrderStatusUpdateApiHandler implements HttpHandler {
     private final SessionFactory sessionFactory;
     private final Gson gson;
+    private final WalletDAO walletDAO ;
 
     public RestaurantOrderStatusUpdateApiHandler(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.gson = new Gson();
+        walletDAO = new WalletDAO(sessionFactory);
     }
 
     @Override
@@ -159,10 +164,22 @@ public class RestaurantOrderStatusUpdateApiHandler implements HttpHandler {
                     sendJson(exchange, 403, jsonError("شما مجاز به تغییر وضعیت این سفارش نیستید"));
                     return;
                 }
-
                 // به‌روزرسانی وضعیت و زمان
+
                 Transaction transaction = session.beginTransaction();
                 try {
+                    if (newStatus.equals(OrderStatus.CANCELLED)) {
+                        Wallet wallet = walletDAO.findByUserId(order.getBuyer().getId());
+                        if (wallet == null) {
+                            wallet = new Wallet();
+                            wallet.setId(order.getBuyer().getId());
+                            wallet.setBalance(BigDecimal.valueOf(0));
+                            session.save(wallet);
+                        }
+                        wallet.setBalance(wallet.getBalance().add(BigDecimal.valueOf(order.getPay_price())));
+                        session.update(wallet);
+
+                    }
                     order.setStatus(newStatus);
                     order.setUpdatedAt(LocalDateTime.now());
                     session.update(order);

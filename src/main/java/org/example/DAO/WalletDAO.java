@@ -7,6 +7,8 @@ import org.example.Models.Wallet;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import java.math.BigDecimal;
+
 public class WalletDAO {
     public final SessionFactory sessionFactory;
 
@@ -37,6 +39,17 @@ public class WalletDAO {
             session.getTransaction().commit();
         }
     }
+
+    public BigDecimal findBalanceByUserId(Long userId) {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "SELECT w.balance FROM Wallet w WHERE w.user.id = :userId";
+            return session.createQuery(hql, BigDecimal.class)
+                    .setParameter("userId", userId)
+                    .uniqueResultOptional()
+                    .orElse(BigDecimal.ZERO); // اگر موجود نبود، صفر برگرداند
+        }
+    }
+
 }
 
 
