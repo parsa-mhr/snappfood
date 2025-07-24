@@ -97,12 +97,12 @@ public class RegisterApiHandler implements HttpHandler {
 
             // اعتبارسنجی متمرکز
             CheckUser validator = new CheckUser(sessionFactory);
-            validator.validate(user, profileImageBase64);
+            //validator.validate(user, profileImageBase64);
 
             // ذخیره در دیتابیس
             UserDAO dao = new UserDAO(sessionFactory);
             dao.save(user);
-            Long userId = user.getId(); // ⬅️ فقط بعد از save استفاده کن
+            Long userId = user.getId();
             String token = jwtSecurity.generateToken(user.getId(), user.getRole().name());
 
             Map<String, Object> responseMap = new LinkedHashMap<>();

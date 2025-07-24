@@ -30,6 +30,11 @@ public class RestaurantDispatcher implements HttpHandler {
             }
 
             // هدایت درخواست‌ها
+             if (segments.length == 2) {
+                 if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                     new RestaurantsApiHandler(sessionFactory).handle(exchange);
+                 }
+             }
             if (segments.length == 4 && segments[3].equals("orders")) {
                 // برای GET /restaurants/{id}/orders
                 if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {

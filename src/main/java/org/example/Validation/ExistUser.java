@@ -37,10 +37,10 @@ public class ExistUser {
         }
 
         // اعتبارسنجی فرمت شماره تلفن
-        String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
-        if (!phone.matches(phoneRegex)) {
-            throw new UnauthorizedException("فرمت شماره تلفن نامعتبر است", "INVALID_PHONE");
-        }
+//        String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
+//        if (!phone.matches(phoneRegex)) {
+//            throw new UnauthorizedException("فرمت شماره تلفن نامعتبر است", "INVALID_PHONE");
+//        }
 
         try (Session session = sessionFactory.openSession()) {
             // جستجوی کاربر بر اساس شماره تلفن

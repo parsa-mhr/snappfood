@@ -203,7 +203,7 @@ public class BuyerApiHandlers {
                 sendError(exchange, 400, e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
-                sendError(exchange, 500, "Server error");
+                sendError(exchange, 500, "Server error" + e.getMessage());
             }
         }
     }

@@ -3,5 +3,6 @@ package org.example.User;
 public enum UserRole {
     buyer,
     seller,
-    courier
+    courier ,
+    admin
 }

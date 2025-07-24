@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Security.jwtSecurity;
 import org.example.User.Courier;
+import org.example.User.Seller;
 import org.example.User.User;
 import org.example.User.BankInfo;
 import org.example.Validation.TokenUserValidator;
@@ -85,6 +86,13 @@ public class ProfileApiHandler implements HttpHandler {
                 Map<String, Object> bankMap = (Map<String, Object>) body.get("bank_info");
                 if (bankMap.containsKey("bank_name") && bankMap.containsKey("account_number")) {
                     courier.setBankInformation(new BankInfo(
+                            bankMap.get("bank_name").toString(),
+                            bankMap.get("account_number").toString()));
+                }
+            }else  if (user instanceof Seller seller && body.containsKey("bank_info")) {
+                Map<String, Object> bankMap = (Map<String, Object>) body.get("bank_info");
+                if (bankMap.containsKey("bank_name") && bankMap.containsKey("account_number")) {
+                    seller.setBankInformation(new BankInfo(
                             bankMap.get("bank_name").toString(),
                             bankMap.get("account_number").toString()));
                 }
