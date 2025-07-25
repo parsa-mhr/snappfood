@@ -152,7 +152,7 @@ public class RestaurantGetMenuItemsApiHandler implements HttpHandler {
 
                 }).toList();
                 // ارسال پاسخ موفقیت‌آمیز
-                sendJson(exchange, 200, gson.toJson(menuItems));
+                sendJson(exchange, 200, gson.toJson(list));
             }
 
         } catch (Exception e) {
