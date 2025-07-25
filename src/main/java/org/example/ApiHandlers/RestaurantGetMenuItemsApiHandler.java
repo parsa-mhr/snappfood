@@ -101,7 +101,7 @@ public class RestaurantGetMenuItemsApiHandler implements HttpHandler {
             // استخراج شناسه رستوران از مسیر
             String path = exchange.getRequestURI().getPath();
             String[] segments = path.split("/");
-            if (segments.length != 4 || !segments[3].equals("menu")) {
+            if (segments.length != 4 || !segments[3].equals("items")) {
                 sendJson(exchange, 400, jsonError("مسیر یا شناسه رستوران نامعتبر است"));
                 return;
             }

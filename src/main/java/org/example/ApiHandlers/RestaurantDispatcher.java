@@ -71,7 +71,7 @@ public class RestaurantDispatcher implements HttpHandler {
                 }else if (segments.length == 4 && segments[3].equals("items")) {
                     // برای GET /restaurants/{id}/item
                     if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
-                        new RestaurantsItemApiHandler(sessionFactory).handle(exchange);
+                        new RestaurantGetMenuItemsApiHandler(sessionFactory).handle(exchange);
                     } else {
                         SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
                     }
