@@ -1,5 +1,7 @@
 package org.example.Models;
 
+import org.example.Restaurant.MenuItem;
+
 import java.util.List;
 
 public class MenuItemDto {
@@ -23,6 +25,16 @@ public class MenuItemDto {
         this.price = price;
         this.supply = supply;
 //        this.keywords = keywords;
+    }
+
+    public MenuItemDto(MenuItem menuItem) {
+        this.id = menuItem.getId();
+        this.name = menuItem.getName() ;
+        this.price = menuItem.getPrice();
+        this.supply = menuItem.getSupply();
+        this.description = menuItem.getDescription();
+        this.imageBase64 = menuItem.getImageBase64();
+        this.vendor_id = Math.toIntExact(menuItem.getRestaurant().getId());
     }
 }
 

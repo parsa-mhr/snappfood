@@ -3,6 +3,7 @@ package org.example.ApiHandlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.example.Models.MenuItemDto;
 import org.example.Restaurant.MenuCategory;
 import org.example.Restaurant.MenuItem;
 import org.example.Restaurant.Restaurant;
@@ -14,6 +15,7 @@ import org.example.Validation.TokenUserValidator;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import java.util.Base64;
 import java.util.List;
 
 import static org.example.ApiHandlers.SendJson.jsonError;
@@ -134,7 +136,21 @@ public class RestaurantGetMenuItemsApiHandler implements HttpHandler {
                         .setParameter("restaurantId", restaurantId)
                         .list();
 
+                List<MenuItemDto> list =  menuItems.stream().map(item -> {
+                    MenuItemDto dto = new MenuItemDto();
+                    dto.id = item.getId();
+                    dto.name = item.getName();
+                    dto.imageBase64 = (item.getImage() != null)
+                            ? Base64.getEncoder().encodeToString(item.getImage())
+                            : null;
+                    dto.description = item.getDescription();
+                    dto.vendor_id = item.getRestaurant().getId().intValue();
+                    dto.price = item.getPrice();
+                    dto.supply = item.getSupply();
+                    //   dto.keywords = item.getKeywords(); // فعلاً category رو جای keywords می‌ذاریم
+                    return dto;
 
+                }).toList();
                 // ارسال پاسخ موفقیت‌آمیز
                 sendJson(exchange, 200, gson.toJson(menuItems));
             }

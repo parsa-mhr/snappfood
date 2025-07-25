@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Restaurant.MenuCategory;
+import org.example.Restaurant.MenuCategoryDTO;
 import org.example.Restaurant.Restaurant;
 import org.example.Unauthorized.UnauthorizedException;
 import org.example.User.Seller;
@@ -20,7 +21,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static java.util.stream.StreamSupport.stream;
 import static org.example.ApiHandlers.SendJson.jsonError;
 import static org.example.ApiHandlers.SendJson.sendJson;
 
@@ -142,6 +145,10 @@ public class RestaurantGetMenuApiHandler implements HttpHandler {
                                 MenuCategory.class)
                         .setParameter("restaurantId", restaurantId)
                         .list();
+
+                List<MenuCategoryDTO> categoryDTOs = menuCategory.stream()
+                        .map(MenuCategoryDTO::new)
+                        .collect(Collectors.toList());
 
 
                 // ارسال پاسخ موفقیت‌آمیز
