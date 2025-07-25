@@ -68,14 +68,31 @@ public class RestaurantDispatcher implements HttpHandler {
                     } else {
                         SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
                     }
-                } else if (segments.length == 4 && segments[3].equals("menu")) {
+                }else if (segments.length == 4 && segments[3].equals("items")) {
+                    // برای GET /restaurants/{id}/item
+                    if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                        new RestaurantsItemApiHandler(sessionFactory).handle(exchange);
+                    } else {
+                        SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                    }
+                }
+                else if (segments.length == 4 && segments[3].equals("menu")) {
                     // برای POST /restaurants/{id}/menu
                     if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
                         new RestaurantMenuApiHandler(sessionFactory).handle(exchange);
                     } else {
                         SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
                     }
-                } else if (segments.length == 4 && segments[3].equals("orders")) {
+                }else if (segments.length == 4 && segments[3].equals("menus")) {
+                // برای GET /restaurants/{id}/menus
+                if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                    new RestaurantGetMenuApiHandler(sessionFactory).handle(exchange);
+                } else {
+                    SendJson.sendJson(exchange, 405, SendJson.jsonError("متد مجاز نیست"));
+                }
+            }
+
+                else if (segments.length == 4 && segments[3].equals("orders")) {
                     // برای GET /restaurants/{id}/orders
                     if (exchange.getRequestMethod().equalsIgnoreCase("GET")) {
                         new RestaurantOrdersApiHandler(sessionFactory).handle(exchange);

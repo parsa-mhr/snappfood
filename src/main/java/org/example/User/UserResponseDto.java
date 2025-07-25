@@ -18,6 +18,7 @@ public class UserResponseDto {
     private String createdAt;
     private BigDecimal walletBalance;
 
+
     public BigDecimal getWalletBalance() {
         return walletBalance;
     }

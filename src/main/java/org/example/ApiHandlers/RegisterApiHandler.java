@@ -86,6 +86,16 @@ public class RegisterApiHandler implements HttpHandler {
                     user = new Buyer(fullName, email, hashedPassword, phone, address);
                     user.setRole(UserRole.buyer);
                 }
+                case "admin" -> {
+                    BankInfo bankInfo = null;
+                    if (body.get("bankInfo") instanceof Map<?, ?> bankInfoMap) {
+                        bankInfo = new BankInfo(
+                                (String) bankInfoMap.get("bankName"),
+                                (String) bankInfoMap.get("accountNumber"));
+                    }
+                    user = new Courier(fullName , email , hashedPassword , phone , address , bankInfo);
+                    user.setRole(UserRole.admin);
+                }
                 default -> {
                     sendJson(exchange, 400, jsonError("Invalid role"));
                     return;
@@ -97,12 +107,12 @@ public class RegisterApiHandler implements HttpHandler {
 
             // اعتبارسنجی متمرکز
             CheckUser validator = new CheckUser(sessionFactory);
-            //validator.validate(user, profileImageBase64);
+            validator.validate(user, profileImageBase64);
 
             // ذخیره در دیتابیس
             UserDAO dao = new UserDAO(sessionFactory);
-            dao.save(user);
             Long userId = user.getId();
+            dao.save(user);
             String token = jwtSecurity.generateToken(user.getId(), user.getRole().name());
 
             Map<String, Object> responseMap = new LinkedHashMap<>();

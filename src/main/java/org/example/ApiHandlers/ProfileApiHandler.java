@@ -70,28 +70,28 @@ public class ProfileApiHandler implements HttpHandler {
 
             session.beginTransaction();
 
-            if (body.containsKey("full_name"))
+            if (body.containsKey("full_name")&& !body.get("full_name").toString().equals("") && body.get("full_name") != null)
                 user.setFullName(body.get("full_name").toString());
-            if (body.containsKey("phone"))
+            if (body.containsKey("phone")&& !body.get("phone").toString().equals("") && body.get("phone") != null)
                 user.setPhonenumber(body.get("phone").toString());
-            if (body.containsKey("email"))
+            if (body.containsKey("email")&& !(body.get("email").toString().equals("")) && body.get("email") != null)
                 user.setEmail(body.get("email").toString());
-            if (body.containsKey("address"))
+            if (body.containsKey("address")&& !body.get("address").toString().equals("") && body.get("address") != null)
                 user.setadress(body.get("address").toString());
-            if (body.containsKey("profileImageBase64"))
+            if (body.containsKey("profileImageBase64") && body.get("profileImageBase64") != null && !body.get("profileImageBase64").toString().equals("") )
                 user.setProfileImageBase64(body.get("profileImageBase64").toString());
 
             // فقط برای Courier
             if (user instanceof Courier courier && body.containsKey("bank_info")) {
                 Map<String, Object> bankMap = (Map<String, Object>) body.get("bank_info");
-                if (bankMap.containsKey("bank_name") && bankMap.containsKey("account_number")) {
+                if (bankMap.containsKey("bank_name") && bankMap.containsKey("account_number") && bankMap.get("account_number") != null  && bankMap.get("bank_name") != null && !bankMap.get("account_number").toString().equals("")  && !bankMap.get("bank_name").toString().equals("")) {
                     courier.setBankInformation(new BankInfo(
                             bankMap.get("bank_name").toString(),
                             bankMap.get("account_number").toString()));
                 }
             }else  if (user instanceof Seller seller && body.containsKey("bank_info")) {
                 Map<String, Object> bankMap = (Map<String, Object>) body.get("bank_info");
-                if (bankMap.containsKey("bank_name") && bankMap.containsKey("account_number")) {
+                if (bankMap.containsKey("bank_name") && bankMap.containsKey("account_number") && !body.get("account_number").toString().equals("") && body.get("account_number") != null && !body.get("bank_name").toString().equals("") && body.get("bank_name") != null) {
                     seller.setBankInformation(new BankInfo(
                             bankMap.get("bank_name").toString(),
                             bankMap.get("account_number").toString()));

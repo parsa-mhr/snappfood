@@ -31,7 +31,7 @@ public class CheckUser {
             throw new InvalidFieldException("Role");
 
         // 2. اعتبارسنجی نقش
-        List<UserRole> validRoles = List.of(UserRole.buyer, UserRole.seller, UserRole.courier);
+        List<UserRole> validRoles = List.of(UserRole.buyer, UserRole.seller, UserRole.courier , UserRole.admin);
         if (!validRoles.contains(user.getRole())) {
             throw new InvalidFieldException("Role");
         }
@@ -46,10 +46,10 @@ public class CheckUser {
         }
 
         // 4. اعتبارسنجی شماره تماس
-        String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
-        if (!user.getPhonenumber().matches(phoneRegex)) {
-            throw new InvalidFieldException("Phone Number");
-        }
+//        String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
+//        if (!user.getPhonenumber().matches(phoneRegex)) {
+//            throw new InvalidFieldException("Phone Number");
+//        }
 
         // 5. اعتبارسنجی ایمیل (اگر مقدار داشته باشه)
         if (user.getEmail() != null &&
