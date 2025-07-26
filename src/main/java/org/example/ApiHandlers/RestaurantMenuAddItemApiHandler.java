@@ -150,7 +150,7 @@ public class RestaurantMenuAddItemApiHandler implements HttpHandler {
             }
             Long itemId;
             try {
-                itemId = ((Number) body.get("item_id")).longValue();
+                itemId = Long.valueOf(( body.get("item_id").toString()));
             } catch (ClassCastException | NullPointerException e) {
                 sendJson(exchange, 400, jsonError("مقدار item_id نامعتبر است"));
                 return;
