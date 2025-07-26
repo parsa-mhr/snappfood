@@ -41,7 +41,7 @@ public class MenuItem {
     @CollectionTable(name = "menu_item_keywords", joinColumns = @JoinColumn(name = "menu_item_id"))
     @Column(name = "keyword", nullable = false)
     @JsonIgnore
-    private List<String> keywords;
+    public List<String> keywords;
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)

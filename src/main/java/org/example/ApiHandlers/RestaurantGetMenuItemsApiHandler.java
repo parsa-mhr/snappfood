@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.Models.MenuItemDto;
+import org.example.Models.MenuItemDto2;
 import org.example.Restaurant.MenuCategory;
 import org.example.Restaurant.MenuItem;
 import org.example.Restaurant.Restaurant;
@@ -136,8 +137,8 @@ public class RestaurantGetMenuItemsApiHandler implements HttpHandler {
                         .setParameter("restaurantId", restaurantId)
                         .list();
 
-                List<MenuItemDto> list =  menuItems.stream().map(item -> {
-                    MenuItemDto dto = new MenuItemDto();
+                List<MenuItemDto2> list =  menuItems.stream().map(item -> {
+                    MenuItemDto2 dto = new MenuItemDto2();
                     dto.id = item.getId();
                     dto.name = item.getName();
                     dto.imageBase64 = (item.getImage() != null)
@@ -147,7 +148,7 @@ public class RestaurantGetMenuItemsApiHandler implements HttpHandler {
                     dto.vendor_id = item.getRestaurant().getId().intValue();
                     dto.price = item.getPrice();
                     dto.supply = item.getSupply();
-                    //   dto.keywords = item.getKeywords(); // فعلاً category رو جای keywords می‌ذاریم
+                    dto.keywords = item.keywords; // فعلاً category رو جای keywords می‌ذاریم
                     return dto;
 
                 }).toList();
