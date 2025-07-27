@@ -9,7 +9,6 @@ import org.example.Restaurant.MenuCategory;
 import org.example.Restaurant.MenuItem;
 import org.example.Restaurant.Restaurant;
 import org.example.Unauthorized.UnauthorizedException;
-import org.example.User.Seller;
 import org.example.User.User;
 import org.example.User.UserRole;
 import org.example.Validation.TokenUserValidator;
@@ -89,17 +88,7 @@ public class RestaurantGetMenuItemsApiHandler implements HttpHandler {
                 return;
             }
 
-            // بررسی نقش کاربر
-            if (user.getRole() == null || user.getRole() != UserRole.seller) {
-                sendJson(exchange, 403, jsonError("فقط فروشندگان می‌توانند دسته‌بندی منو اضافه کنند"));
-                return;
-            }
 
-            // بررسی نوع کاربر (Seller)
-            if (!(user instanceof Seller)) {
-                sendJson(exchange, 403, jsonError("کاربر باید از نوع فروشنده باشد"));
-                return;
-            }
 
             // استخراج شناسه رستوران از مسیر
             String path = exchange.getRequestURI().getPath();
@@ -125,12 +114,7 @@ public class RestaurantGetMenuItemsApiHandler implements HttpHandler {
                     sendJson(exchange, 404, jsonError("رستوران با شناسه " + restaurantId + " یافت نشد"));
                     return;
                 }
-                if (!restaurant.getSeller().getId().equals(user.getId())) {
-                    sendJson(exchange, 403, jsonError("شما مجاز به افزودن دسته‌بندی به منوی این رستوران نیستید"));
-                    return;
-                }
 
-                // ایجاد دسته‌بندی منو
                 List<MenuItem> menuItems = session.createQuery(
                                 "FROM MenuItem m WHERE m.restaurant.id = :restaurantId ",
                                 MenuItem.class)

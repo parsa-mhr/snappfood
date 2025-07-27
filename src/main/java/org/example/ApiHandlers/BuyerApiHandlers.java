@@ -1,5 +1,7 @@
 package org.example.ApiHandlers;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -9,6 +11,7 @@ import com.sun.net.httpserver.HttpHandler;
 import org.example.Details.Cart;
 import org.example.Details.CartItem;
 import org.example.Details.Coupon;
+import org.example.Details.OrderDTO;
 import org.example.Models.*;
 import org.example.Security.jwtSecurity;
 import org.example.Services.*;
@@ -194,7 +197,7 @@ public class BuyerApiHandlers {
                 TokenUserValidator tokenvalidate = new TokenUserValidator(sessionFactory) ;
 
                 Buyer buyer = (Buyer) tokenvalidate.validate(token); // extract from jwt;
-                OrderResponseDto cart = orderService.createOrder(request, buyer);
+                OrderDTO cart = orderService.createOrder(request, buyer);
 
                 sendJson(exchange, 201, cart);
             } catch (JsonSyntaxException e) {
@@ -217,7 +220,7 @@ public class BuyerApiHandlers {
             try {
                 int id = parseId(exchange);
 
-                OrderResponseDto response = orderService.getById(id);
+                OrderDTO response = orderService.getById(id);
                 if (response ==  null) { sendError(exchange,404,"Not found"); return; }
                 sendJson(exchange,200,response);
             } catch (NumberFormatException e) {
@@ -238,7 +241,7 @@ public class BuyerApiHandlers {
             try {
                 //extract from jwt
                 long id = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer " , ""))).getId();
-                List<OrderResponseDto> hist = orderService.getHistory((int) id);
+                List<OrderDTO> hist = orderService.getHistory((int) id);
 
 //                List<OrderResponseDto> dtos = new ArrayList<>();
 //                for (Cart cart : hist) {
@@ -273,11 +276,29 @@ public class BuyerApiHandlers {
                 for (Favorite favorite : list) {
                     favorite.getRestaurant().setSeller(null);
                 }
-                sendJson(exchange,200,list);
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                String json = mapper.writeValueAsString(list);
+
+                sendText(exchange,200,json);
             } catch (Exception e) {
                 sendError(exchange,400,e.getMessage());
             }
         }
+
+        public void sendText(HttpExchange exchange, int statusCode, String text) throws IOException {
+            byte[] responseBytes = text.getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
+            exchange.sendResponseHeaders(statusCode, responseBytes.length);
+
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
+        }
+
+
     }
 
     // PUT /favorites/{restaurantID}
@@ -310,8 +331,7 @@ public class BuyerApiHandlers {
                     fav.setRestaurant(restaurant);
 
                     Favorite saved = favoriteService.addFavorite(fav);
-                    saved.getRestaurant().setSeller(null);
-                    sendJson(exchange, 201, saved);
+                    sendJson(exchange, 201, "restaurant Saved as favorite");
 
                 } catch (NumberFormatException e) {
                     sendError(exchange, 400, "Invalid restaurant ID");

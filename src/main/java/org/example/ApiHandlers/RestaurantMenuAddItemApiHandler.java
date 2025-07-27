@@ -17,6 +17,7 @@ import org.hibernate.SessionFactory;
 import jakarta.persistence.Query;
 
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -124,6 +125,8 @@ public class RestaurantMenuAddItemApiHandler implements HttpHandler {
             try {
                 restaurantId = Long.parseLong(segments[2]);
                 categoryTitle = segments[4];
+                categoryTitle = URLDecoder.decode(categoryTitle , StandardCharsets.UTF_8);
+
                 if (categoryTitle.isEmpty()) {
                     throw new IllegalArgumentException("عنوان دسته‌بندی نمی‌تواند خالی باشد");
                 }
@@ -148,9 +151,9 @@ public class RestaurantMenuAddItemApiHandler implements HttpHandler {
                 sendJson(exchange, 400, jsonError("فیلد اجباری item_id وجود ندارد"));
                 return;
             }
-            Long itemId;
+            Double itemId;
             try {
-                itemId = Long.valueOf(( body.get("item_id").toString()));
+                itemId = Double.valueOf(( body.get("item_id").toString()));
             } catch (ClassCastException | NullPointerException e) {
                 sendJson(exchange, 400, jsonError("مقدار item_id نامعتبر است"));
                 return;

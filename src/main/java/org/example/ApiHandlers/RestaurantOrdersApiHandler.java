@@ -139,9 +139,14 @@ public class RestaurantOrdersApiHandler implements HttpHandler {
                         cart.getCart_id(),
                         cart.getDelivery_address(),
                         cart.getBuyer().getId(),
+                        cart.getBuyer().getFullName() ,
                         cart.getRestaurant().getId(),
                         cart.getCoupon() != null ? cart.getCoupon().getId() : null,
-                        cart.getItems().stream().map(CartItem -> CartItem.getMenuItem().getId()).collect(Collectors.toList()),
+                        cart.getItems().stream()
+                                .collect(Collectors.toMap(
+                                        item -> item.getMenuItem().getId(),
+                                        CartItem::getQuantity
+                                )) ,
                         cart.getPay_price() ,
                         cart.getRestaurant().getTaxFee(),
                         cart.getRestaurant().getAdditionalFee(),

@@ -1,10 +1,7 @@
 package org.example.Services;
 
 import org.example.DAO.OrderDAO;
-import org.example.Details.Cart;
-import org.example.Details.CartItem;
-import org.example.Details.Coupon;
-import org.example.Details.OrderStatus;
+import org.example.Details.*;
 import org.example.Models.CreateOrderReq;
 import org.example.Models.HistoryBody;
 import org.example.Models.OrderResponseDto;
@@ -15,14 +12,17 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Order;
 import org.hibernate.query.Query;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class OrderService {
     private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
     OrderDAO orderDAO = new OrderDAO(factory);
-    public OrderResponseDto createOrder(CreateOrderReq request, Buyer buyer) {
+    public OrderDTO createOrder(CreateOrderReq request, Buyer buyer) {
         try (Session session = factory.openSession()) {
             session.beginTransaction();
 
@@ -54,14 +54,14 @@ public class OrderService {
 
             session.save(cart);
             session.getTransaction().commit();
-            OrderResponseDto response = toResponse(cart);
+            OrderDTO response = toResponse(cart);
 
             return response;
         }
     }
 
 
-    public OrderResponseDto getById(int id) {
+    public OrderDTO getById(int id) {
         try (Session s = factory.openSession()) {
         Optional <Cart> cart = Optional.ofNullable(s.get(Cart.class, id));
         if (cart.isEmpty()) return null ;
@@ -80,7 +80,7 @@ public class OrderService {
     }
 
 
-    public List<OrderResponseDto> getHistory(int buyerId) {
+    public List<OrderDTO> getHistory(int buyerId) {
         try (Session s = factory.openSession()) {
             // توجه کنید که اینجا o.buyer.id را با پارامتر bid مقایسه می‌کنیم
             Query<Cart> q = s.createQuery(
@@ -97,7 +97,7 @@ public class OrderService {
                 Hibernate.initialize(cart.getCoupon());
                 Hibernate.initialize(cart.getItems());
             }
-            List <OrderResponseDto> dtos = new ArrayList<>();
+            List <OrderDTO> dtos = new ArrayList<>();
             for (Cart cart : hist) {
                 dtos.add(toResponse(cart));
             }
@@ -137,44 +137,40 @@ public class OrderService {
             }
 
     }
-        public static OrderResponseDto toResponse(Cart cart) {
-            OrderResponseDto res = new OrderResponseDto();
-            res.id = cart.getCart_id();
-            res.delivery_address = cart.getDelivery_address();
-            res.customer_id = cart.getBuyer().getId();
-            res.vendor_id = cart.getRestaurant().getId();
-            res.coupon_id = cart.getCoupon() != null ? cart.getCoupon().getId() : null;
+        public static OrderDTO toResponse(Cart cart) {
+            OrderDTO res = new OrderDTO(
+                    cart.getCart_id(),
+                    cart.getDelivery_address(),
+                    cart.getBuyer().getId(),
+                    cart.getBuyer().getFullName() ,
+                    cart.getRestaurant().getId(),
+                    cart.getCoupon() != null ? cart.getCoupon().getId() : null,
+                    cart.getItems().stream()
+                            .collect(Collectors.toMap(
+                                    item -> item.getMenuItem().getId(),
+                                    CartItem::getQuantity
+                            )) ,
+                    cart.getPay_price() ,
+                    cart.getRestaurant().getTaxFee(),
+                    cart.getRestaurant().getAdditionalFee(),
+                    0 ,
+                    cart.getPay_price(),
+                    cart.getCourier_Id() != null ? Long.valueOf(cart.getCourier_Id()) : null,
+                    cart.getStatus() != null ? cart.getStatus().toString() : "UNKNOWN",
+                    cart.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                    cart.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            );
 
             // فرض: در CartItem قیمت واحد آیتم هست
-            Map<Long , Integer> itemIds = new HashMap<>();
-            double rawPrice = 0;
-            for (CartItem item : cart.getItems()) {
-                itemIds.put(item.getMenuItem().getId() ,  item.getQuantity());
-                rawPrice += item.getMenuItem().getPrice() * item.getQuantity();
-            }
-
-            res.item_ids = itemIds;
-            res.raw_price = rawPrice;
-            res.tax_fee = rawPrice * 0.09; // فرض: 9٪ مالیات
-            res.additional_fee = 0;
-            res.courier_fee = 30000; // عدد فرضی
-            res.pay_price = res.raw_price + res.tax_fee + res.additional_fee + res.courier_fee;
-            cart.setPay_price((long) res.pay_price);
-            res.courier_id = cart.getCourier_Id(); // در لحظه سفارش‌گذاری تعیین نمی‌شود
-            res.status = cart.getStatus().toString();
-
-            res.created_at = cart.getCreatedAt().toString();
-            res.updated_at = cart.getUpdatedAt().toString();
-
             return res;
         }
 
 
-    public List<OrderResponseDto> findAll() {
+    public List<OrderDTO> findAll() {
         System.out.println("OrderService.findAll called"); // Debug log
         List<Cart> orders = orderDAO.findAll();
         System.out.println("Carts fetched: " + orders.size()); // Debug log
-        List<OrderResponseDto> list = new ArrayList<>();
+        List<OrderDTO> list = new ArrayList<>();
         for (Cart cart : orders) {
             list.add(toResponse(cart));
         }

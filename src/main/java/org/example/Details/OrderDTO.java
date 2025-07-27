@@ -1,14 +1,16 @@
 package org.example.Details;
 
 import java.util.List;
+import java.util.Map;
 
 public class OrderDTO {
     private final Long id;
     private final String deliveryAddress;
     private final Long customerId;
+    private final String costumerName;
     private final Long vendorId;
     private final Long couponId;
-    private final List<Long> itemIds;
+    private final Map<Long , Integer> itemIds;
     private final int rawPrice;
     private final int taxFee;
     private final int additionalFee;
@@ -19,8 +21,8 @@ public class OrderDTO {
     private final String createdAt;
     private final String updatedAt;
 
-    public OrderDTO(Long id, String deliveryAddress, Long customerId, Long vendorId, Long couponId,
-                    List<Long> itemIds, long rawPrice, int taxFee, int additionalFee, int courierFee,
+    public OrderDTO(Long id, String deliveryAddress, Long customerId, String costumerName, Long vendorId, Long couponId,
+                    Map<Long , Integer> itemIds, long rawPrice, int taxFee, int additionalFee, int courierFee,
                     long payPrice, Long courierId, String status, String createdAt, String updatedAt) {
         this.id = id;
         this.deliveryAddress = deliveryAddress;
@@ -37,6 +39,7 @@ public class OrderDTO {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.costumerName = costumerName;
     }
 
     // getterها
@@ -60,7 +63,7 @@ public class OrderDTO {
         return couponId;
     }
 
-    public List<Long> getItemIds() {
+    public Map<Long , Integer> getItemIds() {
         return itemIds;
     }
 

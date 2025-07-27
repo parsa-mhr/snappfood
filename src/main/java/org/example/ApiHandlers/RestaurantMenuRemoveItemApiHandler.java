@@ -14,6 +14,9 @@ import org.example.Unauthorized.UnauthorizedException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import jakarta.persistence.Query;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.example.ApiHandlers.SendJson.jsonError;
@@ -121,6 +124,7 @@ public class RestaurantMenuRemoveItemApiHandler implements HttpHandler {
             try {
                 restaurantId = Long.parseLong(segments[2]);
                 categoryTitle = segments[4];
+                categoryTitle = URLDecoder.decode(categoryTitle , StandardCharsets.UTF_8);
                 itemId = Long.parseLong(segments[5]);
                 if (categoryTitle.isEmpty()) {
                     throw new IllegalArgumentException("عنوان دسته‌بندی نمی‌تواند خالی باشد");

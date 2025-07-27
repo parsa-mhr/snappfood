@@ -10,6 +10,7 @@ import org.example.DAO.TransactionDAO;
 import org.example.DAO.UserDAO;
 import org.example.DAO.WalletDAO;
 import org.example.Details.Cart;
+import org.example.Details.OrderDTO;
 import org.example.Models.*;
 import org.example.Services.*;
 import org.example.User.*;
@@ -265,7 +266,7 @@ public class TransactionsApiHandlers {
                     return;
                 }
                 System.out.println("Fetching all orders..."); // Debug log
-                List<OrderResponseDto> orders = orderService.findAll();
+                List<OrderDTO> orders = orderService.findAll();
                 System.out.println("Orders fetched: " + orders.size()); // Debug log
                 HttpUtils.sendJson(exchange, 200, orders);
             } catch (Exception e) {
