@@ -357,43 +357,61 @@ public class BuyerApiHandlers {
     public static class RatingsListHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) { sendEmpty(exchange,405); return; }
-            RatingRequest req = gson.fromJson(
-                    new InputStreamReader(exchange.getRequestBody()),
-                    RatingRequest.class
-            );
-            Cart cart = orderService.getCartById(req.getOrder_id());
-            if (cart == null) {
-                sendError(exchange, 404, "Order not found");
-                return;
-            }
-            List<MenuItem> menuItems = new ArrayList<>();
-            Rating rating = new Rating();
-            rating.setOrder_id(cart);
-            rating.setRating(req.getRating());
-            rating.setComment(req.getComment());
-            for (CartItem item : cart.getItems()) {
-                menuItems.add(item.getMenuItem());
-                item.getMenuItem().setKeywords(null);
-            }
-            rating.setItems(menuItems);
-            long BuyerId = 0;
-            try {
-                BuyerId = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer ", ""))).getId();
+            if (exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                RatingRequest req = gson.fromJson(
+                        new InputStreamReader(exchange.getRequestBody()),
+                        RatingRequest.class
+                );
+                Cart cart = orderService.getCartById(req.getOrder_id());
+                if (cart == null) {
+                    sendError(exchange, 404, "Order not found");
+                    return;
+                }
+                List<MenuItem> menuItems = new ArrayList<>();
+                Rating rating = new Rating();
+                rating.setOrder_id(cart);
+                rating.setRating(req.getRating());
+                rating.setComment(req.getComment());
+                for (CartItem item : cart.getItems()) {
+                    menuItems.add(item.getMenuItem());
+                    item.getMenuItem().setKeywords(null);
+                }
+                rating.setItems(menuItems);
+                long BuyerId = 0;
+                try {
+                    BuyerId = (new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer ", ""))).getId();
 
-            }catch (Exception e) {
-                sendError(exchange, 401, "login again");
-            }
-            rating.setBuyerId((int) BuyerId);
-            if (req.getImageBase64() != null && !req.getImageBase64().isEmpty()) {
-                rating.setImageBase64(req.getImageBase64().get(0));
-            }
-            try {
-                Rating rated = ratingService.addRating(rating);
-                sendJson(exchange,200,"Rating submitted"+ "Rating id :" + rated.getId());
-            }catch (Exception e) {
-                sendError(exchange, 400, "Rating submitted on this order before");
-            }
+                } catch (Exception e) {
+                    sendError(exchange, 401, "login again");
+                }
+                rating.setBuyerId((int) BuyerId);
+                if (req.getImageBase64() != null && !req.getImageBase64().isEmpty()) {
+                    rating.setImageBase64(req.getImageBase64().get(0));
+                }
+                try {
+                    Rating rated = ratingService.addRating(rating);
+                    sendJson(exchange, 200, "Rating submitted" + "Rating id :" + rated.getId());
+                } catch (Exception e) {
+                    sendError(exchange, 400, "Rating submitted on this order before");
+                }
+            }else if (exchange.getRequestMethod().equalsIgnoreCase("GET")){
+                int BuyerId = 0;
+                try {
+                    BuyerId = Math.toIntExact((new TokenUserValidator(sessionFactory).validate(exchange.getRequestHeaders().getFirst("Authorization").replace("Bearer ", ""))).getId());
+
+                } catch (Exception e) {
+                    sendError(exchange, 401, "login again");
+                }
+                try {
+                    List<RatingResponseDto> list = ratingService.listByUser(BuyerId);
+                    sendJson(exchange , 200 , list);
+                }catch (Exception e){
+                    sendError(exchange , 400 , "something happend in getting ratings");
+                }
+
+
+            }else
+                sendError(exchange , 405 , "method is not allowed");
 
         }
     }

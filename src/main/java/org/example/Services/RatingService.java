@@ -36,6 +36,21 @@ public class RatingService {
                     .collect(Collectors.toList());
         }
     }
+    public List<RatingResponseDto> listByUser(int userId) {
+        try (Session s = factory.openSession()) {
+            Query<Rating> q = s.createQuery(
+                    "SELECT r FROM Rating r WHERE r.buyerId = :bid",
+                    Rating.class
+            );
+            q.setParameter("bid", userId);
+            List<Rating> ratings = q.list();
+
+            // تبدیل لیست به لیست DTO
+            return ratings.stream()
+                    .map(RatingService::toDto)
+                    .collect(Collectors.toList());
+        }
+    }
 
     public RatingResponseDto getById(int id) {
         try (Session s = factory.openSession()) {
@@ -112,6 +127,8 @@ public class RatingService {
                         Collections.singletonList(rating.getImageBase64()) :
                         Collections.emptyList()
         );
+        dto.setOrder_id(rating.getOrder_id().getCart_id());
+        dto.setRestaurant_name(rating.getOrder_id().getRestaurant().getName());
 
         // در صورتی که بخوای از تاریخ سفارش استفاده کنی مثلاً:
         if (rating.getOrder_id() != null && rating.getOrder_id().getCreatedAt() != null) {

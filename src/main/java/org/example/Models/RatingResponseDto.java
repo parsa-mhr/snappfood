@@ -10,6 +10,24 @@ public class RatingResponseDto {
     private List<String> imageBase64;
     private Integer user_id;
     private String created_at;
+    private long order_id ;
+    private String restaurant_name;
+
+    public String getRestaurant_name() {
+        return restaurant_name;
+    }
+
+    public void setRestaurant_name(String restaurant_name) {
+        this.restaurant_name = restaurant_name;
+    }
+
+    public long getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(long order_id) {
+        this.order_id = order_id;
+    }
 
     // Getters and Setters
     public Integer getId() { return id; }
@@ -20,6 +38,7 @@ public class RatingResponseDto {
     }
 
     public void setItem_ids(List<Long> item_ids) {
+
         this.item_ids = item_ids;
     }
 

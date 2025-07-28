@@ -1,13 +1,13 @@
 package org.example.Details;
 
 public enum OrderStatus {
-    SUBMITTED,
-    UNPAID_AND_CANCELLED,
+    SUBMITTED,//
     WAITING_VENDOR,
-    CANCELLED,
+    WAITING_RESTAURANT,
+    CANCELLED,//کنسل رستوران
     FINDING_COURIER,
-    ON_THE_WAY,
-    COMPLETED,
-    ACCEPTED ,
-    COURIER_ACCEPTED
+    ON_THE_WAY,//تحویل
+    COMPLETED,//تحویل نهایی
+    ACCEPTED ,//تایید رستوران
+    COURIER_ACCEPTED// قبول کردن
 }
