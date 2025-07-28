@@ -80,12 +80,9 @@ public class BuyerApiHandlers {
             if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) { sendEmpty(exchange,405); return; }
             try {
                 int id = parseId(exchange);
-                List<MenuItem> opt = restaurantService.getById(id);
+                List<MenuCategoryDTO> opt = restaurantService.getById(id);
                 if (opt.size() == 0) { sendError(exchange,404,"Not found"); return; }
-                List<MenuItemDto> dtoList = opt.stream()
-                        .map(mi -> new MenuItemDto(mi.getId() , mi.getName(), mi.getImageBase64(), mi.getDescription(), Math.toIntExact(mi.getRestaurant().getId()), mi.getPrice(), mi.getSupply()))
-                        .toList();
-                sendJson(exchange,200,dtoList);
+                sendJson(exchange,200,opt);
             } catch (NumberFormatException e) {
                 sendError(exchange,400,"Invalid ID");
             } catch (Exception e) {

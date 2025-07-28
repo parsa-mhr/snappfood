@@ -8,6 +8,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RestaurantService {
     private final SessionFactory sessionFactory;
@@ -52,11 +53,19 @@ public class RestaurantService {
     }
 
 
-    public List<MenuItem> getById(int id) {
+    public List<MenuCategoryDTO> getById(int id) {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("SELECT mi FROM MenuItem mi WHERE mi.restaurant.id = :restaurantId", MenuItem.class)
+            List<MenuCategory> menuCategory = session.createQuery(
+                            "FROM MenuCategory m WHERE m.restaurant.id = :restaurantId",
+                            MenuCategory.class)
                     .setParameter("restaurantId", id)
-                    .getResultList();
+                    .list();
+
+            List<MenuCategoryDTO> categoryDTOs = menuCategory.stream()
+                    .map(MenuCategoryDTO::new)
+                    .collect(Collectors.toList());
+            return categoryDTOs;
+
         }
     }
     public Restaurant getRestaurantById(int id) {
