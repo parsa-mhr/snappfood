@@ -57,10 +57,7 @@ public class RegisterApiHandler implements HttpHandler {
             String profileImageBase64 = (String) body.get("profileImageBase64");
             String hashedPassword = PasswordUtil.hashPassword(password);
 
-            byte[] imageBytes = null;
-            if (profileImageBase64 != null) {
-                imageBytes = Base64.getDecoder().decode(profileImageBase64);
-            }
+
             if (password == null) {
                 throw new InvalidFieldException("Password");
             }

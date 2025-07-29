@@ -138,6 +138,7 @@ public abstract class User {
     }
 
     public String getProfileImageBase64() {
+
         return profileImageBase64;
     }
 
