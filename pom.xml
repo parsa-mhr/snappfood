@@ -76,6 +76,12 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.15.4</version> <!-- یا همان نسخه‌ای که برای jackson-databind استفاده کردی -->
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
+
 
 
 

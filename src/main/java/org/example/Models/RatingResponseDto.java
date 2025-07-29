@@ -12,6 +12,15 @@ public class RatingResponseDto {
     private String created_at;
     private long order_id ;
     private String restaurant_name;
+    private String sellerReply;
+
+    public String getSellerReply() {
+        return sellerReply;
+    }
+
+    public void setSellerReply(String sellerReply) {
+        this.sellerReply = sellerReply;
+    }
 
     public String getRestaurant_name() {
         return restaurant_name;

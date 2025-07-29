@@ -30,6 +30,15 @@ public class Rating {
     private Integer rating;
     private String comment;
     private String imageBase64;
+    private String sellerReply;
+
+    public String getSellerReply() {
+        return sellerReply;
+    }
+
+    public void setSellerReply(String sellerReply) {
+        this.sellerReply = sellerReply;
+    }
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }

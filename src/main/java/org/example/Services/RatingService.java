@@ -115,6 +115,7 @@ public class RatingService {
         dto.setRating(rating.getRating());
         dto.setComment(rating.getComment());
         dto.setUser_id(rating.getBuyerId());
+        dto.setSellerReply(rating.getSellerReply());
 
         List<Long> itemIds = rating.getItems()
                 .stream()

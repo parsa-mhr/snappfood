@@ -102,6 +102,7 @@ public class Main {
         server.createContext("/admin/restaurants" , new AdminApiHandlers.AdminRestaurantsListHandler());
         server.createContext("/admin/menus/" , new AdminApiHandlers.AdminMenuStatusHandler());
         server.createContext("/admin/restaurants/" , new AdminApiHandlers.AdminRestaurantStatusHandler());
+        server.createContext("/ratings/reply/" , new SellerReplyController.RatingReplyHandler(sessionFactory));
 
 
 //
