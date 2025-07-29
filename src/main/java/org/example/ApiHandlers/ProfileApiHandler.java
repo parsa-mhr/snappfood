@@ -3,6 +3,7 @@ package org.example.ApiHandlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.example.DAO.WalletDAO;
 import org.example.Security.jwtSecurity;
 import org.example.User.Courier;
 import org.example.User.Seller;
@@ -14,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,9 +26,12 @@ import static org.example.ApiHandlers.SendJson.sendJson;
 public class ProfileApiHandler implements HttpHandler {
 
     private final SessionFactory sessionFactory;
+    private final WalletDAO walletDAO;
+
 
     public ProfileApiHandler(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        this.walletDAO = new WalletDAO(sessionFactory);
     }
 
     @Override
@@ -111,6 +116,8 @@ public class ProfileApiHandler implements HttpHandler {
 
     // 📤 متد برای دریافت اطلاعات پروفایل
     private void handleGetProfile(HttpExchange exchange, User user) {
+        BigDecimal balance = walletDAO.findBalanceByUserId(user.getId());
+
         Map<String, Object> userMap = new LinkedHashMap<>();
         userMap.put("id", String.valueOf(user.getId()));
         userMap.put("full_name", user.getFullName());
@@ -119,6 +126,7 @@ public class ProfileApiHandler implements HttpHandler {
         userMap.put("role", user.getRole().name());
         userMap.put("address", user.getadress());
         userMap.put("profileImageBase64", user.getProfileImageBase64());
+        userMap.put("balance" , balance) ;
 
         if (user instanceof Courier courier && courier.getBankInformation() != null) {
             Map<String, String> bankMap = new LinkedHashMap<>();

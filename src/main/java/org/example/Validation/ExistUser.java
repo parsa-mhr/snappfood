@@ -57,6 +57,8 @@ public class ExistUser {
             if (!PasswordUtil.checkPassword(password, user.getPassword())) {
                 throw new UnauthorizedException("رمز عبور نادرست است", "INVALID_PASSWORD");
             }
+            if (!user.getStatus().equals("approved"))
+                throw new UnauthorizedException("کاربر مجاز به ورود نیست" , "INACTIVE_USER");
 
             return user;
         } catch (Exception e) {

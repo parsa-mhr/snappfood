@@ -85,6 +85,7 @@ public class RegisterApiHandler implements HttpHandler {
                 case "buyer" -> {
                     user = new Buyer(fullName, email, hashedPassword, phone, address);
                     user.setRole(UserRole.buyer);
+                    user.setStatus("approved");
                 }
                 case "admin" -> {
                     BankInfo bankInfo = null;
@@ -95,6 +96,7 @@ public class RegisterApiHandler implements HttpHandler {
                     }
                     user = new Courier(fullName , email , hashedPassword , phone , address , bankInfo);
                     user.setRole(UserRole.admin);
+                    user.setStatus("approved");
                 }
                 default -> {
                     sendJson(exchange, 400, jsonError("Invalid role"));

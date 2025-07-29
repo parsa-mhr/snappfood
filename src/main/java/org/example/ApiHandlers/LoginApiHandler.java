@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.example.DAO.WalletDAO;
 import org.example.Security.jwtSecurity;
 import org.example.User.User;
 import org.example.Unauthorized.UnauthorizedException;
@@ -13,12 +14,14 @@ import org.example.Validation.ExistUser;
 import org.hibernate.SessionFactory;
 
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.example.Security.jwtSecurity;
 import static org.example.ApiHandlers.SendJson.jsonError;
 import static org.example.ApiHandlers.SendJson.sendJson;
+import org.example.DAO.WalletDAO;
 
 /**
  * کلاس LoginApiHandler برای مدیریت درخواست‌های POST به endpoint /auth/login
@@ -30,6 +33,8 @@ public class LoginApiHandler implements HttpHandler {
     private static final String SECRET = "your_jwt_secret_key"; // کلید مخفی JWT
     private static final String ISSUER = "aut_food"; // صادرکننده توکن
     private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000; // 24 ساعت
+    private final WalletDAO walletDAO;
+
 
     /**
      * سازنده کلاس که SessionFactory را دریافت می‌کند
@@ -38,6 +43,7 @@ public class LoginApiHandler implements HttpHandler {
     public LoginApiHandler(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.gson = new Gson();
+        this.walletDAO = new WalletDAO(sessionFactory);
     }
 
     /**
@@ -101,7 +107,7 @@ public class LoginApiHandler implements HttpHandler {
                         message = "رمز عبور نادرست است";
                         break;
                     case "INACTIVE_USER":
-                        message = "حساب کاربر غیرفعال است";
+                        message = "حساب کاربر تایید نشده غیرفعال است";
                         break;
                     default:
                         message = "خطای احراز هویت: " + e.getMessage();
@@ -112,13 +118,15 @@ public class LoginApiHandler implements HttpHandler {
 
             // تولید توکن JWT
             String token = jwtSecurity.generateToken(user.getId(), user.getRole().name());
+            BigDecimal balance = walletDAO.findBalanceByUserId(user.getId());
 
             // ارسال پاسخ موفقیت‌آمیز
             sendJson(exchange, 200, gson.toJson(Map.of(
                     "message", "ورود با موفقیت انجام شد",
                     "token", token,
                     "user_id", user.getId() != null ? user.getId().toString() : "null",
-                    "role", user.getRole().toString()
+                    "role", user.getRole().toString() ,
+                    "balance" , balance
             )));
 
         } catch (Exception e) {
