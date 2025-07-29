@@ -139,7 +139,6 @@ public class RestaurantGetMenuApiHandler implements HttpHandler {
                     return;
                 }
 
-                // ایجاد دسته‌بندی منو
                 List<MenuCategory> menuCategory = session.createQuery(
                                 "FROM MenuCategory m WHERE m.restaurant.id = :restaurantId AND m.status = 'approved' ",
                                 MenuCategory.class)
