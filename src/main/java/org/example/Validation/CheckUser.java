@@ -36,14 +36,6 @@ public class CheckUser {
             throw new InvalidFieldException("Role");
         }
 
-        // 3. اعتبارسنجی base64 عکس اگر وجود داشت
-        if (profileImageBase64 != null) {
-            try {
-                Base64.getDecoder().decode(profileImageBase64);
-            } catch (Exception e) {
-                throw new InvalidFieldException("ProfileImageBase64");
-            }
-        }
 
         // 4. اعتبارسنجی شماره تماس
 //        String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
