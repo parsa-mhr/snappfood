@@ -33,7 +33,7 @@ public class RestaurantService {
                         hql.append(" OR ");
                     }
                 }
-                hql.append(") AND m.status = 'approved'");
+                hql.append(") AND r.status = 'approved'");
             }
 
             Query<Restaurant> query = session.createQuery(hql.toString(), Restaurant.class);

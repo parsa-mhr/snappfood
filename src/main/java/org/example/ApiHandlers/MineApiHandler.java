@@ -114,7 +114,7 @@ public class MineApiHandler implements HttpHandler {
             // دریافت لیست رستوران‌های متعلق به فروشنده از پایگاه داده
             try (Session session = sessionFactory.openSession()) {
                 List<Restaurant> restaurants = session.createQuery(
-                        "FROM Restaurant WHERE seller.id = :sellerId", Restaurant.class)
+                        "FROM Restaurant WHERE seller.id = :sellerId AND status = 'approved'", Restaurant.class)
                         .setParameter("sellerId", user.getId())
                         .getResultList();
 
