@@ -21,11 +21,7 @@ public class MenuItem {
     @Column(nullable = false)
     private String name;
 
-    @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
-    private byte[] image;
-
-    @Transient
+    @Column(columnDefinition = "LONGTEXT")
     private String imageBase64;
 
     @Column(nullable = false, length = 1000)
@@ -63,23 +59,13 @@ public class MenuItem {
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public byte[] getImage() { return image; }
+
     public void setImage(byte[] image) {
-        this.image = image;
         this.imageBase64 = (image != null) ? Base64.getEncoder().encodeToString(image) : null;
     }
     public String getImageBase64() { return imageBase64; }
     public void setImageBase64(String imageBase64) {
         this.imageBase64 = imageBase64;
-        if (imageBase64 != null && !imageBase64.isEmpty()) {
-            try {
-                this.image = Base64.getDecoder().decode(imageBase64);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("فرمت imageBase64 نامعتبر است");
-            }
-        } else {
-            this.image = null;
-        }
     }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

@@ -266,7 +266,7 @@ public class RestaurantsItemApiHandler implements HttpHandler {
                         "price", item.getPrice(),
                         "supply", item.getSupply(),
                         "keywords", item.getKeywords(),
-                        "image", item.getImage() != null ? item.getImage() : ""
+                        "image", item.getImageBase64() != null ? item.getImageBase64() : ""
                 );
                 sendJson(exchange, 201, gson.toJson(response));
             }

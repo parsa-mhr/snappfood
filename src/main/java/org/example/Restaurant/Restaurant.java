@@ -81,18 +81,6 @@ public class Restaurant {
         this.menu = menu;
     }
 
-    //    @ElementCollection
-//    @Column(name = "working_hours")
-//    private List<String> workingHours = new ArrayList<>(); // ساعات کاری رستوران (اختیاری)
-
-//    @ElementCollection
-//    @Column(name = "categories")
-//    private List<String> categories = new ArrayList<>(); // دسته‌بندی‌های رستوران (اختیاری)
-
-    @Lob
-    @Column(name = "logo", columnDefinition = "LONGBLOB")
-    @Expose
-    private byte[] logo; // لوگوی رستوران به‌صورت باینری
 
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
@@ -105,7 +93,7 @@ public class Restaurant {
     @com.google.gson.annotations.Expose
     private Long sellerId;
 
-    @Transient
+    @Column(columnDefinition = "LONGTEXT")
     private String logoBase64; // لوگوی رستوران به‌صورت رشته Base64 برای پاسخ‌های API
 
     @Transient
@@ -193,18 +181,9 @@ public class Restaurant {
 //        return categories;
 //    }
 
-    public void setLogo(byte[] logo) {
-        this.logo = logo;
-        this.logoBase64 = (logo != null) ? Base64.getEncoder().encodeToString(logo) : null;
-    }
-
-    public byte[] getLogo() {
-        return logo;
-    }
 
     public void setLogoBase64(String logoBase64) {
         this.logoBase64 = logoBase64;
-        this.logo = (logoBase64 != null) ? Base64.getDecoder().decode(logoBase64) : null;
     }
 
     public String getLogoBase64() {

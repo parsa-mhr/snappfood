@@ -105,8 +105,8 @@ public class BuyerApiHandlers {
                     MenuItemDto dto = new MenuItemDto();
                     dto.id = item.getId();
                     dto.name = item.getName();
-                    dto.imageBase64 = (item.getImage() != null)
-                            ? Base64.getEncoder().encodeToString(item.getImage())
+                    dto.imageBase64 = (item.getImageBase64() != null)
+                            ?item.getImageBase64()
                             : null;
                     dto.description = item.getDescription();
                     dto.vendor_id = item.getRestaurant().getId().intValue();
