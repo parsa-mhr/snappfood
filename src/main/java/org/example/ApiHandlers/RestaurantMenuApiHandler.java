@@ -197,7 +197,7 @@ public class RestaurantMenuApiHandler implements HttpHandler {
 
                 // ارسال پاسخ موفقیت‌آمیز
                 sendJson(exchange, 201, gson.toJson(Map.of(
-                        "message", "دسته‌بندی با موفقیت به منوی رستوران اضافه شد",
+                        "message", "دسته‌بندی با موفقیت به منوی رستوران اضافه شد و پس از تایید ادمین نمایش داده خواهد شد",
                         "categoryId", menuCategory.getId())));
             }
 

@@ -33,7 +33,7 @@ public class RestaurantService {
                         hql.append(" OR ");
                     }
                 }
-                hql.append(")");
+                hql.append(") AND m.status = 'approved'");
             }
 
             Query<Restaurant> query = session.createQuery(hql.toString(), Restaurant.class);
@@ -56,7 +56,7 @@ public class RestaurantService {
     public List<MenuCategoryDTO> getById(int id) {
         try (Session session = sessionFactory.openSession()) {
             List<MenuCategory> menuCategory = session.createQuery(
-                            "FROM MenuCategory m WHERE m.restaurant.id = :restaurantId",
+                            "FROM MenuCategory m WHERE m.restaurant.id = :restaurantId AND m.status = 'approved' ",
                             MenuCategory.class)
                     .setParameter("restaurantId", id)
                     .list();

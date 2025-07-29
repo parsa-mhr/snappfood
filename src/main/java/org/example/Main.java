@@ -98,6 +98,11 @@ public class Main {
         server.createContext("/admin/orders" , new TransactionsApiHandlers.AdminOrdersListHandler());
         server.createContext("/admin/transactions" , new TransactionsApiHandlers.AdminTransactionsListHandler());
         server.createContext("/admin/coupons" , new AdminCouponsHandler());
+        server.createContext("/admin/menus" , new AdminApiHandlers.AdminMenusListHandler());
+        server.createContext("/admin/restaurants" , new AdminApiHandlers.AdminRestaurantsListHandler());
+        server.createContext("/admin/menus/" , new AdminApiHandlers.AdminMenuStatusHandler());
+        server.createContext("/admin/restaurants/" , new AdminApiHandlers.AdminRestaurantStatusHandler());
+
 
 //
 

@@ -42,7 +42,46 @@ public class Restaurant {
     @Expose
     private Integer additional_fee; // هزینه اضافی رستوران (اجباری)
 
-//    @ElementCollection
+    @Column
+    private String status ;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getTax_fee() {
+        return tax_fee;
+    }
+
+    public void setTax_fee(Integer tax_fee) {
+        this.tax_fee = tax_fee;
+    }
+
+    public Integer getAdditional_fee() {
+        return additional_fee;
+    }
+
+    public void setAdditional_fee(Integer additional_fee) {
+        this.additional_fee = additional_fee;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+    }
+
+    //    @ElementCollection
 //    @Column(name = "working_hours")
 //    private List<String> workingHours = new ArrayList<>(); // ساعات کاری رستوران (اختیاری)
 
