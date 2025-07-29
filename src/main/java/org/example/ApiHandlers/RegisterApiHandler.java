@@ -104,7 +104,6 @@ public class RegisterApiHandler implements HttpHandler {
                 }
             }
 
-            user.setImage(imageBytes);
             user.setProfileImageBase64(profileImageBase64);
 
             // اعتبارسنجی متمرکز

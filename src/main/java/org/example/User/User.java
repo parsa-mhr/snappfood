@@ -30,7 +30,7 @@ public abstract class User {
     @Column(name = "image", columnDefinition = "LONGBLOB")
     protected byte[] image;
 
-    @Transient // چون فقط برای API هست و قرار نیست مستقیم در دیتابیس ذخیره بشه
+    @Column(columnDefinition = "LONGTEXT")
     private String profileImageBase64;
 
     @Enumerated(EnumType.STRING)
@@ -135,14 +135,6 @@ public abstract class User {
 
     public void setadress(String adress) {
         this.adress = adress;
-    }
-
-    public byte[] getImage() {
-        return image;
-    }
-
-    public void setImage(byte[] image) {
-        this.image = image;
     }
 
     public String getProfileImageBase64() {

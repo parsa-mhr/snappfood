@@ -102,7 +102,7 @@ public class ProfileApiHandler implements HttpHandler {
                             bankMap.get("account_number").toString()));
                 }
             }
-
+            System.out.println(user.getProfileImageBase64()); // قبل از ذخیره
             session.update(user);
             session.getTransaction().commit();
 
