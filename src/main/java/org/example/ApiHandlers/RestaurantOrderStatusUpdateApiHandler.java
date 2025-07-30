@@ -172,7 +172,7 @@ public class RestaurantOrderStatusUpdateApiHandler implements HttpHandler {
                         Wallet wallet = walletDAO.findByUserId(order.getBuyer().getId());
                         if (wallet == null) {
                             wallet = new Wallet();
-                            wallet.setId(order.getBuyer().getId());
+                            wallet.setUser(order.getBuyer());
                             wallet.setBalance(BigDecimal.valueOf(0));
                             session.save(wallet);
                         }

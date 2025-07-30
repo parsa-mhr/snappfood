@@ -129,7 +129,7 @@ public class RestaurantOrdersApiHandler implements HttpHandler {
                 }
 
                 // دریافت لیست سفارشات
-                String hql = "FROM Cart c WHERE c.restaurant.id = :restaurantId";
+                String hql = "FROM Cart c WHERE c.restaurant.id = :restaurantId AND c.status != 'SUBMITTED' ";
                 List<Cart> orders = session.createQuery(hql, Cart.class)
                         .setParameter("restaurantId", restaurantId)
                         .list();

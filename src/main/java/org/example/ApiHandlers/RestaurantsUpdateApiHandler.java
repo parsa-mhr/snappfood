@@ -184,12 +184,12 @@ public class RestaurantsUpdateApiHandler implements HttpHandler {
                         sendJson(exchange, 400, jsonError("شماره تلفن رستوران نمی‌تواند خالی باشد"));
                         return;
                     }
-                    String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
-                    if (!phone.matches(phoneRegex)) {
-                        session.getTransaction().rollback();
-                        sendJson(exchange, 400, jsonError("فرمت شماره تلفن نامعتبر است"));
-                        return;
-                    }
+//                    String phoneRegex = "^(09\\d{9}|۰۹[۰-۹]{9})$";
+//                    if (!phone.matches(phoneRegex)) {
+//                        session.getTransaction().rollback();
+//                        sendJson(exchange, 400, jsonError("فرمت شماره تلفن نامعتبر است"));
+//                        return;
+//                    }
                     restaurant.setPhone(phone);
                 }
                 if (body.containsKey("tax_fee")) {
