@@ -10,7 +10,7 @@ public class OrderDTO {
     private final String costumerName;
     private final Long vendorId;
     private final Long couponId;
-    private final Map<Long , Integer> itemIds;
+    private final Map<String , Integer> itemIds;
     private final int rawPrice;
     private final int taxFee;
     private final int additionalFee;
@@ -22,7 +22,7 @@ public class OrderDTO {
     private final String updatedAt;
 
     public OrderDTO(Long id, String deliveryAddress, Long customerId, String costumerName, Long vendorId, Long couponId,
-                    Map<Long , Integer> itemIds, long rawPrice, int taxFee, int additionalFee, int courierFee,
+                    Map<String , Integer> itemIds, long rawPrice, int taxFee, int additionalFee, int courierFee,
                     long payPrice, Long courierId, String status, String createdAt, String updatedAt) {
         this.id = id;
         this.deliveryAddress = deliveryAddress;
@@ -63,7 +63,7 @@ public class OrderDTO {
         return couponId;
     }
 
-    public Map<Long , Integer> getItemIds() {
+    public Map<String , Integer> getItemIds() {
         return itemIds;
     }
 

@@ -147,7 +147,7 @@ public class OrderService {
                     cart.getCoupon() != null ? cart.getCoupon().getId() : null,
                     cart.getItems().stream()
                             .collect(Collectors.toMap(
-                                    item -> item.getMenuItem().getId(),
+                                    item -> item.getMenuItem().getName(),
                                     CartItem::getQuantity
                             )) ,
                     cart.getPay_price() ,
