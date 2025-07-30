@@ -29,6 +29,7 @@ public class Rating {
 
     private Integer rating;
     private String comment;
+    @Column(columnDefinition = "LONGTEXT")
     private String imageBase64;
     private String sellerReply;
 

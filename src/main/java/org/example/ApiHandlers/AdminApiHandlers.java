@@ -34,7 +34,7 @@ public class AdminApiHandlers {
     private static final OrderService orderService;
     private static final OrderDAO orderDAO;
     private static final WalletDAO walletDAO;
-    private static final Gson gson;
+    static final Gson gson;
 
 
     static {

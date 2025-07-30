@@ -13,6 +13,15 @@ public class RatingResponseDto {
     private long order_id ;
     private String restaurant_name;
     private String sellerReply;
+    private String username ;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public String getSellerReply() {
         return sellerReply;
